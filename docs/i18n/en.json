@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Creative Testing - Optimize Your Meta Ads Performance",
+    "title": "Insights - Optimize Your Meta Ads Performance",
     "lang": "en"
   },
   "nav": {
@@ -16,7 +16,7 @@
     "stat_roas": "Average ROAS Improvement"
   },
   "features": {
-    "title": "Powerful Features for Creative Testing",
+    "title": "Powerful Insights Features",
     "badge": "Features",
     "subtitle": "Everything you need to optimize your Meta Ads creative performance",
     "cards": [
@@ -25,7 +25,7 @@
         "description": "Monitor your creative performance in real-time with automatic updates every 2 hours. Track impressions, clicks, CTR, conversions, and ROAS across all your campaigns."
       },
       {
-        "title": "Creative Testing Framework",
+        "title": "Insights Framework",
         "description": "Identify winning angles, hooks, and creator styles with our advanced naming system. Automatically parse and categorize your ads to discover result-generating patterns."
       },
       {
@@ -60,7 +60,7 @@
         "features": [
           "Up to 3 ad accounts",
           "Real-time analytics",
-          "Creative testing framework",
+          "Insights framework",
           "Basic support",
           "Data export (CSV)",
           "Automatic updates every 2 hours"
@@ -74,7 +74,7 @@
         "features": [
           "Unlimited ad accounts",
           "Real-time analytics",
-          "Advanced creative testing",
+          "Advanced insights",
           "Priority support",
           "API access",
           "Custom integrations",
@@ -87,11 +87,11 @@
   },
   "cta": {
     "title": "Ready to Optimize Your Creative Performance?",
-    "subtitle": "Join hundreds of advertisers using Creative Testing to scale their profitable campaigns.",
+    "subtitle": "Join hundreds of advertisers using Insights to scale their profitable campaigns.",
     "button": "Get Started Free - No Credit Card Required"
   },
   "footer": {
-    "copyright": "© 2025 Creative Testing Dashboard. All rights reserved."
+    "copyright": "© 2025 Insights. All rights reserved."
   },
   "oauth": {
     "title": "Connecting...",
@@ -122,7 +122,7 @@
   },
   "dashboard": {
     "page_title": "Meta Ads Performance Dashboard",
-    "header_title": "Creative Testing Dashboard",
+    "header_title": "Insights Dashboard",
     "header_subtitle": "Creative Performance Analysis • Last updated:",
     "loading": "Loading...",
     "loading_messages": {

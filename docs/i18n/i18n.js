@@ -1,5 +1,5 @@
 /**
- * i18n Helper - Minimal internationalization for Creative Testing Dashboard
+ * i18n Helper - Minimal internationalization for Insights Dashboard
  * Supports ES (default) and EN via ?lang=en query parameter
  */
 

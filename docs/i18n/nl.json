@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Creative Testing - Optimaliseer je Meta Ads Prestaties",
+    "title": "Insights - Optimaliseer je Meta Ads Prestaties",
     "lang": "nl"
   },
   "nav": {
@@ -16,7 +16,7 @@
     "stat_roas": "Gemiddelde ROAS-verbetering"
   },
   "features": {
-    "title": "Krachtige Functies voor Creative Testing",
+    "title": "Krachtige Insights-functies",
     "badge": "Functies",
     "subtitle": "Alles wat je nodig hebt om de creatieve prestaties van je Meta Ads te optimaliseren",
     "cards": [
@@ -25,7 +25,7 @@
         "description": "Monitor je creatieve prestaties in real-time met automatische updates elke 2 uur. Volg impressies, klikken, CTR, conversies en ROAS voor al je campagnes."
       },
       {
-        "title": "Creative Testing Framework",
+        "title": "Insights Framework",
         "description": "Identificeer winnende angles, hooks en creator-stijlen met ons geavanceerde naamgevingssysteem. Parse en categoriseer je advertenties automatisch om resultaat-genererende patronen te ontdekken."
       },
       {
@@ -60,7 +60,7 @@
         "features": [
           "Tot 3 advertentieaccounts",
           "Real-time analytics",
-          "Creative testing framework",
+          "Insights framework",
           "Basis ondersteuning",
           "Data export (CSV)",
           "Automatische updates elke 2 uur"
@@ -74,7 +74,7 @@
         "features": [
           "Onbeperkte advertentieaccounts",
           "Real-time analytics",
-          "Geavanceerde creative testing",
+          "Geavanceerde insights",
           "Prioriteit ondersteuning",
           "API toegang",
           "Aangepaste integraties",
@@ -87,11 +87,11 @@
   },
   "cta": {
     "title": "Klaar om je Creatieve Prestaties te Optimaliseren?",
-    "subtitle": "Sluit je aan bij honderden adverteerders die Creative Testing gebruiken om hun winstgevende campagnes te schalen.",
+    "subtitle": "Sluit je aan bij honderden adverteerders die Insights gebruiken om hun winstgevende campagnes te schalen.",
     "button": "Start Gratis - Geen Creditcard Vereist"
   },
   "footer": {
-    "copyright": "© 2025 Creative Testing Dashboard. Alle rechten voorbehouden."
+    "copyright": "© 2025 Insights. Alle rechten voorbehouden."
   },
   "oauth": {
     "title": "Verbinden...",
@@ -122,7 +122,7 @@
   },
   "dashboard": {
     "page_title": "Meta Ads Performance Dashboard",
-    "header_title": "Creative Testing Dashboard",
+    "header_title": "Insights Dashboard",
     "header_subtitle": "Creatieve Prestatie Analyse • Laatst bijgewerkt:",
     "loading": "Laden...",
     "loading_messages": {

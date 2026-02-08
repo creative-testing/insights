@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Creative Testing - Optimer dine Meta Ads-resultater",
+    "title": "Insights - Optimer dine Meta Ads-resultater",
     "lang": "da"
   },
   "nav": {
@@ -16,7 +16,7 @@
     "stat_roas": "Gennemsnitlig ROAS-forbedring"
   },
   "features": {
-    "title": "Kraftfulde funktioner til kreativ test",
+    "title": "Kraftfulde Insights-funktioner",
     "badge": "Funktioner",
     "subtitle": "Alt hvad du behøver for at optimere dine Meta Ads kreative resultater",
     "cards": [
@@ -25,7 +25,7 @@
         "description": "Overvåg dine kreative resultater i realtid med automatiske opdateringer hver 2. time. Spor visninger, klik, CTR, konverteringer og ROAS på tværs af alle dine kampagner."
       },
       {
-        "title": "Kreativ testramme",
+        "title": "Insights-ramme",
         "description": "Identificer vindende vinkler, hooks og skaberstile med vores avancerede navngivningssystem. Kategoriser og analyser automatisk dine annoncer for at opdage resultatgenererende mønstre."
       },
       {
@@ -60,7 +60,7 @@
         "features": [
           "Op til 3 annoncekonti",
           "Realtidsanalyse",
-          "Kreativ testramme",
+          "Insights-ramme",
           "Grundlæggende support",
           "Dataeksport (CSV)",
           "Automatiske opdateringer hver 2. time"
@@ -74,7 +74,7 @@
         "features": [
           "Ubegrænsede annoncekonti",
           "Realtidsanalyse",
-          "Avanceret kreativ test",
+          "Avanceret Insights",
           "Prioriteret support",
           "API-adgang",
           "Tilpassede integrationer",
@@ -87,11 +87,11 @@
   },
   "cta": {
     "title": "Klar til at optimere dine kreative resultater?",
-    "subtitle": "Slut dig til hundredvis af annoncører, der bruger Creative Testing til at skalere deres profitable kampagner.",
+    "subtitle": "Slut dig til hundredvis af annoncører, der bruger Insights til at skalere deres profitable kampagner.",
     "button": "Kom gratis i gang - Intet kreditkort påkrævet"
   },
   "footer": {
-    "copyright": "© 2025 Creative Testing Dashboard. Alle rettigheder forbeholdes."
+    "copyright": "© 2025 Insights. Alle rettigheder forbeholdes."
   },
   "oauth": {
     "title": "Forbinder...",
@@ -122,7 +122,7 @@
   },
   "dashboard": {
     "page_title": "Meta Ads Performance Dashboard",
-    "header_title": "Creative Testing Dashboard",
+    "header_title": "Insights Dashboard",
     "header_subtitle": "Kreativ præstationsanalyse • Sidst opdateret:",
     "loading": "Indlæser...",
     "loading_messages": {

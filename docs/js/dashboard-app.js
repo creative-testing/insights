@@ -3,7 +3,7 @@
             console.warn('i18n not loaded, using fallback for key:', key);
             // Return the Spanish text as fallback (original language)
             const fallbackTexts = {
-                'dashboard.header_title': 'Creative Testing Dashboard',
+                'dashboard.header_title': 'Insights Dashboard',
                 'dashboard.kpis.ads_with_spend': 'Anuncios con Inversión',
                 'dashboard.kpis.total_spend': 'Inversión Total',
                 'dashboard.accounts.all': 'Todas las cuentas'
@@ -3022,7 +3022,7 @@
             const url = URL.createObjectURL(blob);
             
             link.setAttribute('href', url);
-            link.setAttribute('download', `creative_testing_${currentPeriod}d_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute('download', `insights_${currentPeriod}d_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);

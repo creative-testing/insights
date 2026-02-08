@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Creative Testing - Optimiza el Rendimiento de tus Anuncios Meta",
+    "title": "Insights - Optimiza el Rendimiento de tus Anuncios Meta",
     "lang": "es"
   },
   "nav": {
@@ -16,7 +16,7 @@
     "stat_roas": "Mejora ROAS Promedio"
   },
   "features": {
-    "title": "Funcionalidades Potentes para Testing Creativo",
+    "title": "Funcionalidades Potentes de Insights",
     "badge": "Funcionalidades",
     "subtitle": "Todo lo que necesitas para optimizar el rendimiento de tus creativos en Meta Ads",
     "cards": [
@@ -25,7 +25,7 @@
         "description": "Monitorea el rendimiento de tus creativos en tiempo real con actualización automática cada 2 horas. Rastrea impresiones, clics, CTR, conversiones y ROAS en todas tus campañas."
       },
       {
-        "title": "Framework de Testing Creativo",
+        "title": "Framework de Insights",
         "description": "Identifica ángulos, hooks y estilos de creadores ganadores con nuestro sistema avanzado de nomenclatura. Parsea y categoriza tus anuncios automáticamente para descubrir patrones que generan resultados."
       },
       {
@@ -60,7 +60,7 @@
         "features": [
           "Hasta 3 cuentas publicitarias",
           "Analítica en tiempo real",
-          "Framework de testing creativo",
+          "Framework de Insights",
           "Soporte básico",
           "Exportación de datos (CSV)",
           "Actualización automática cada 2 horas"
@@ -74,7 +74,7 @@
         "features": [
           "Cuentas publicitarias ilimitadas",
           "Analítica en tiempo real",
-          "Testing creativo avanzado",
+          "Insights avanzado",
           "Soporte prioritario",
           "Acceso a API",
           "Integraciones personalizadas",
@@ -87,11 +87,11 @@
   },
   "cta": {
     "title": "¿Listo para Optimizar el Rendimiento de tus Creativos?",
-    "subtitle": "Únete a cientos de anunciantes que usan Creative Testing para escalar sus campañas rentables.",
+    "subtitle": "Únete a cientos de anunciantes que usan Insights para escalar sus campañas rentables.",
     "button": "Comenzar Gratis - Sin Tarjeta de Crédito"
   },
   "footer": {
-    "copyright": "© 2025 Creative Testing Dashboard. Todos los derechos reservados."
+    "copyright": "© 2025 Insights. Todos los derechos reservados."
   },
   "oauth": {
     "title": "Conectando...",
@@ -122,7 +122,7 @@
   },
   "dashboard": {
     "page_title": "Meta Ads Performance Dashboard",
-    "header_title": "Creative Testing Dashboard",
+    "header_title": "Insights Dashboard",
     "header_subtitle": "Análisis de rendimiento creativo • Última actualización:",
     "loading": "Cargando...",
     "loading_messages": {
