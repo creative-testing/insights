@@ -13,6 +13,84 @@
 const SUPABASE_URL = 'https://romjdysjrgyzhlnrduro.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvbWpkeXNqcmd5emhsbnJkdXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQzMzc2NzMsImV4cCI6MjAzOTkxMzY3M30.qjCoEYFqFmGPO8V4k4sessNgHZLqoRU7OI2WG6NJPWE';
 const INSIGHTS_API_URL = 'https://insights.theaipipe.com';
+const SSO_COOKIE_KEY = 'sb-romjdysjrgyzhlnrduro-auth-token';
+const SSO_COOKIE_DOMAIN = '.theaipipe.com';
+
+// === Shared Cookie Storage for Cross-App SSO ===
+
+function _isProd() {
+    return window.location.hostname.includes('theaipipe.com');
+}
+
+function _setCookie(name, value, days) {
+    days = days || 400;
+    var expires = new Date(Date.now() + days * 864e5).toUTCString();
+    var domainAttr = _isProd() ? '; domain=' + SSO_COOKIE_DOMAIN : '';
+    var secureAttr = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/' + domainAttr + '; SameSite=Lax' + secureAttr;
+}
+
+function _getCookie(name) {
+    var match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+function _deleteCookie(name) {
+    var domainAttr = _isProd() ? '; domain=' + SSO_COOKIE_DOMAIN : '';
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + domainAttr;
+}
+
+var sharedCookieStorage = {
+    getItem: function(key) {
+        // Try direct cookie
+        var direct = _getCookie(key);
+        if (direct) return direct;
+        // Check for chunked storage
+        var countStr = _getCookie(key + '.chunk_count');
+        if (countStr) {
+            var count = parseInt(countStr, 10);
+            var result = '';
+            for (var i = 0; i < count; i++) {
+                var chunk = _getCookie(key + '.' + i);
+                if (!chunk) return null;
+                result += chunk;
+            }
+            return result;
+        }
+        return null;
+    },
+    setItem: function(key, value) {
+        var encoded = encodeURIComponent(value);
+        if (encoded.length <= 3500) {
+            this._removeChunks(key);
+            _setCookie(key, value);
+        } else {
+            var chunks = [];
+            for (var i = 0; i < value.length; i += 3500) {
+                chunks.push(value.slice(i, i + 3500));
+            }
+            _deleteCookie(key);
+            _setCookie(key + '.chunk_count', String(chunks.length));
+            for (var j = 0; j < chunks.length; j++) {
+                _setCookie(key + '.' + j, chunks[j]);
+            }
+        }
+    },
+    removeItem: function(key) {
+        _deleteCookie(key);
+        this._removeChunks(key);
+    },
+    _removeChunks: function(key) {
+        var countStr = _getCookie(key + '.chunk_count');
+        if (countStr) {
+            var count = parseInt(countStr, 10);
+            for (var i = 0; i < count; i++) {
+                _deleteCookie(key + '.' + i);
+            }
+            _deleteCookie(key + '.chunk_count');
+        }
+    }
+};
 
 // Initialize Supabase client (loaded via CDN)
 // Note: window.supabase is the SDK, _supabaseClient is our instance
@@ -23,8 +101,13 @@ function initSupabase() {
         return true; // Already initialized
     }
     if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-        _supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client initialized');
+        _supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: sharedCookieStorage,
+                storageKey: SSO_COOKIE_KEY,
+            }
+        });
+        console.log('Supabase client initialized (with shared cookie storage)');
         return true;
     }
     console.error('Supabase SDK not loaded');
@@ -197,6 +280,67 @@ async function checkAuth() {
 }
 
 /**
+ * Check for a shared SSO session (cross-app cookie from Imagen/Scriptwriter)
+ * If a valid Supabase session exists, try to authenticate with Insights backend.
+ *
+ * Returns:
+ *   { authenticated: true, token, tenantId } if SSO succeeds
+ *   { authenticated: false, reason } otherwise
+ */
+async function checkSSOSession() {
+    if (!_supabaseClient && !initSupabase()) {
+        return { authenticated: false, reason: 'supabase_not_initialized' };
+    }
+
+    try {
+        const { data: { session } } = await _supabaseClient.auth.getSession();
+        if (!session) {
+            return { authenticated: false, reason: 'no_session' };
+        }
+
+        console.log('[SSO] Found shared session for:', session.user?.email);
+
+        // Call the backend SSO endpoint
+        const response = await fetch(`${INSIGHTS_API_URL}/api/auth/facebook/login-via-supabase`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('[SSO] Login via Supabase succeeded');
+
+            // Store Insights tokens
+            localStorage.setItem('auth_token', result.access_token);
+            localStorage.setItem('tenant_id', result.tenant_id);
+            localStorage.setItem('supabase_user_id', result.supabase_user_id);
+
+            return {
+                authenticated: true,
+                token: result.access_token,
+                tenantId: result.tenant_id
+            };
+        }
+
+        if (response.status === 403) {
+            const errorData = await response.json();
+            console.log('[SSO] User exists but Facebook not linked:', errorData.detail);
+            return { authenticated: false, reason: 'facebook_not_linked' };
+        }
+
+        console.warn('[SSO] Unexpected response:', response.status);
+        return { authenticated: false, reason: 'backend_error' };
+
+    } catch (err) {
+        console.error('[SSO] Error:', err);
+        return { authenticated: false, reason: 'error' };
+    }
+}
+
+/**
  * Logout - clear all auth data
  */
 async function logout() {
@@ -204,6 +348,9 @@ async function logout() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('tenant_id');
     localStorage.removeItem('supabase_user_id');
+
+    // Clear shared SSO cookie
+    sharedCookieStorage.removeItem(SSO_COOKIE_KEY);
 
     // Sign out from Supabase
     if (_supabaseClient) {
@@ -308,6 +455,7 @@ window.SupabaseAuth = {
     linkFacebook: linkFacebookIdentity,
     handleCallback: handleSupabaseCallback,
     checkAuth,
+    checkSSOSession,
     logout,
     getAccounts,
     initSupabase

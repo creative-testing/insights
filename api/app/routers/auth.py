@@ -453,6 +453,82 @@ def test_token(tenant_id: str, db: Session = Depends(get_db)):
 
 # === Supabase Auth Sync Endpoint ===
 
+@router.post("/login-via-supabase")
+async def login_via_supabase(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """
+    SSO endpoint: authenticate an Insights user from a shared Supabase session.
+
+    Used by the cross-app cookie SSO flow when a user navigates from
+    Imagen/Scriptwriter to Insights via the AppSwitcher.
+
+    1. Validates the Supabase JWT from the Authorization header
+    2. Looks up the user by supabase_user_id
+    3. Checks they have a valid (non-expired) Meta OAuth token
+    4. Returns an Insights JWT if everything checks out
+
+    Returns 403 if user not found or Facebook not linked.
+    """
+    # 1. Extract and validate Supabase JWT
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing Authorization header")
+
+    supabase_token = auth_header.replace("Bearer ", "")
+    supabase_payload = verify_supabase_token(supabase_token)
+
+    supabase_user_id = supabase_payload.get("sub")
+    if not supabase_user_id:
+        raise HTTPException(status_code=401, detail="Invalid Supabase token: missing user ID")
+
+    # 2. Look up user by supabase_user_id
+    user = db.execute(
+        select(models.User).where(models.User.supabase_user_id == supabase_user_id)
+    ).scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=403,
+            detail="User not found in Insights. Please connect your Facebook account first."
+        )
+
+    # 3. Check for a valid (non-expired) Meta OAuth token
+    oauth_token = db.execute(
+        select(models.OAuthToken).where(
+            models.OAuthToken.user_id == user.id,
+            models.OAuthToken.provider == "meta"
+        )
+    ).scalar_one_or_none()
+
+    if not oauth_token:
+        raise HTTPException(
+            status_code=403,
+            detail="Facebook not linked. Please connect your Facebook Ads account."
+        )
+
+    if oauth_token.expires_at and oauth_token.expires_at < datetime.utcnow():
+        raise HTTPException(
+            status_code=403,
+            detail="Facebook token expired. Please reconnect your Facebook Ads account."
+        )
+
+    # 4. Generate Insights JWT
+    insights_token = create_access_token(
+        user_id=user.id,
+        tenant_id=user.tenant_id
+    )
+
+    return JSONResponse({
+        "success": True,
+        "access_token": insights_token,
+        "tenant_id": str(user.tenant_id),
+        "user_id": str(user.id),
+        "supabase_user_id": supabase_user_id,
+    })
+
+
 @router.post("/sync-facebook")
 async def sync_facebook_token(
     request: Request,

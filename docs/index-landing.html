@@ -1274,13 +1274,35 @@
         }
 
         // Check for action=link_facebook parameter on page load
-        document.addEventListener('DOMContentLoaded', () => {
+        // Also check for shared SSO session (cross-app cookie from Imagen/Scriptwriter)
+        document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('action') === 'link_facebook') {
                 // Clean the URL
                 window.history.replaceState({}, document.title, window.location.pathname);
                 // Show the linking modal
                 showLinkFacebookModal();
+                return;
+            }
+
+            // If already authenticated locally, skip SSO check
+            const existingToken = localStorage.getItem('auth_token');
+            const existingTenant = localStorage.getItem('tenant_id');
+            if (existingToken && existingTenant) return;
+
+            // Try cross-app SSO: check if there's a shared Supabase session
+            if (window.SupabaseAuth && typeof window.SupabaseAuth.checkSSOSession === 'function') {
+                const ssoResult = await window.SupabaseAuth.checkSSOSession();
+                if (ssoResult.authenticated) {
+                    // SSO succeeded → redirect to dashboard
+                    console.log('[SSO] Auto-login succeeded, redirecting to dashboard');
+                    checkAuthAndRedirect(ssoResult.token, ssoResult.tenantId);
+                } else if (ssoResult.reason === 'facebook_not_linked') {
+                    // User is authenticated via Supabase but hasn't linked Facebook
+                    console.log('[SSO] User detected but Facebook not linked');
+                    showLinkFacebookModal();
+                }
+                // For 'no_session' or other reasons: do nothing, show landing normally
             }
         });
 
