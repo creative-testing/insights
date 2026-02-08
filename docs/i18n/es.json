@@ -10,10 +10,14 @@
     "title": "Optimiza el Rendimiento de tus Creativos en Meta Ads",
     "subtitle": "Analiza qué creativos funcionan mejor, identifica patrones ganadores y escala tus campañas rentables con insights basados en datos.",
     "cta_primary": "Comenzar Gratis",
-    "cta_secondary": "Ver Precios"
+    "cta_secondary": "Ver Precios",
+    "stat_advertisers": "Anunciantes",
+    "stat_adspend": "Ad Spend Analizado",
+    "stat_roas": "Mejora ROAS Promedio"
   },
   "features": {
     "title": "Funcionalidades Potentes para Testing Creativo",
+    "badge": "Funcionalidades",
     "subtitle": "Todo lo que necesitas para optimizar el rendimiento de tus creativos en Meta Ads",
     "cards": [
       {
@@ -44,6 +48,7 @@
   },
   "pricing": {
     "title": "Precios Simples y Transparentes",
+    "badge": "Precios",
     "subtitle": "Elige el plan que se ajuste a las necesidades de tu negocio",
     "badge_popular": "Más Popular",
     "period": "/mes",

@@ -10,10 +10,14 @@
     "title": "Optimaliseer de Creatieve Prestaties van je Meta Ads",
     "subtitle": "Analyseer welke creatives het beste presteren, identificeer winnende patronen en schaal winstgevende campagnes met data-gedreven inzichten.",
     "cta_primary": "Start Gratis",
-    "cta_secondary": "Bekijk Prijzen"
+    "cta_secondary": "Bekijk Prijzen",
+    "stat_advertisers": "Adverteerders",
+    "stat_adspend": "Geanalyseerde advertentie-uitgaven",
+    "stat_roas": "Gemiddelde ROAS-verbetering"
   },
   "features": {
     "title": "Krachtige Functies voor Creative Testing",
+    "badge": "Functies",
     "subtitle": "Alles wat je nodig hebt om de creatieve prestaties van je Meta Ads te optimaliseren",
     "cards": [
       {
@@ -44,6 +48,7 @@
   },
   "pricing": {
     "title": "Eenvoudige en Transparante Prijzen",
+    "badge": "Prijzen",
     "subtitle": "Kies het plan dat past bij je bedrijfsbehoeften",
     "badge_popular": "Meest Populair",
     "period": "/maand",

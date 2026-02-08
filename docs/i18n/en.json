@@ -10,10 +10,14 @@
     "title": "Optimize Your Meta Ads Creative Performance",
     "subtitle": "Analyze which creatives perform best, identify winning patterns, and scale profitable campaigns with data-driven insights.",
     "cta_primary": "Get Started Free",
-    "cta_secondary": "View Pricing"
+    "cta_secondary": "View Pricing",
+    "stat_advertisers": "Advertisers",
+    "stat_adspend": "Ad Spend Analyzed",
+    "stat_roas": "Average ROAS Improvement"
   },
   "features": {
     "title": "Powerful Features for Creative Testing",
+    "badge": "Features",
     "subtitle": "Everything you need to optimize your Meta Ads creative performance",
     "cards": [
       {
@@ -44,6 +48,7 @@
   },
   "pricing": {
     "title": "Simple and Transparent Pricing",
+    "badge": "Pricing",
     "subtitle": "Choose the plan that fits your business needs",
     "badge_popular": "Most Popular",
     "period": "/month",

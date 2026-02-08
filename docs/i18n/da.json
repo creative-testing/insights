@@ -10,10 +10,14 @@
     "title": "Optimer dine Meta Ads kreative resultater",
     "subtitle": "Analyser hvilke kreativer der præsterer bedst, identificer vindende mønstre, og skaler profitable kampagner med datadrevne indsigter.",
     "cta_primary": "Kom gratis i gang",
-    "cta_secondary": "Se priser"
+    "cta_secondary": "Se priser",
+    "stat_advertisers": "Annoncører",
+    "stat_adspend": "Annonceforbrug analyseret",
+    "stat_roas": "Gennemsnitlig ROAS-forbedring"
   },
   "features": {
     "title": "Kraftfulde funktioner til kreativ test",
+    "badge": "Funktioner",
     "subtitle": "Alt hvad du behøver for at optimere dine Meta Ads kreative resultater",
     "cards": [
       {
@@ -44,6 +48,7 @@
   },
   "pricing": {
     "title": "Enkle og transparente priser",
+    "badge": "Priser",
     "subtitle": "Vælg den plan der passer til din virksomheds behov",
     "badge_popular": "Mest populær",
     "period": "/måned",
