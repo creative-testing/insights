@@ -10,6 +10,7 @@ MODE BASELINE vs TAIL (parité avec fetch_with_smart_limits.py):
 """
 import gc
 import json
+import sentry_sdk
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional, Tuple
 from uuid import UUID
@@ -59,9 +60,11 @@ def _load_existing_baseline(tenant_id: UUID, ad_account_id: str) -> Optional[Dic
         # Fichier n'existe pas - normal pour un premier run
         return None
     except json.JSONDecodeError as e:
+        sentry_sdk.capture_exception(e)
         print(f"⚠️ Baseline corrompu (JSON): {e}, forcing BASELINE mode")
         return None
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         print(f"⚠️ Erreur chargement baseline: {e}, forcing BASELINE mode")
         return None
 
@@ -271,9 +274,8 @@ async def sync_account_data(
         print(f"✅ Enrichment complete")
     except Exception as e:
         # Enrichment failure is non-fatal - continue with UNKNOWN formats
+        sentry_sdk.capture_exception(e)
         print(f"⚠️ Enrichment failed: {e}")
-        import traceback
-        traceback.print_exc()
 
     # 9. Enrichir avec account_name et account_id
     for ad in daily_insights:

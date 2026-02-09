@@ -5,6 +5,7 @@ Router pour la gestion des comptes publicitaires et informations utilisateur
 - API peut utiliser jusqu'à 10 workers (nouvel user qui attend)
 - Le CRON s'efface automatiquement si l'API est occupée
 """
+import sentry_sdk
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
@@ -62,6 +63,7 @@ async def _run_refresh_job(job_id: UUID, fb_account_id: str, tenant_id: UUID):
             db.commit()
 
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         # 4. En cas d'erreur, marquer comme ERROR
         job = db.get(RefreshJob, job_id)
         if job:

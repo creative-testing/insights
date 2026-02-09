@@ -6,6 +6,7 @@ Fetch les insights avec breakdowns age/gender, agrège par segment,
 calcule les métriques (CTR, CPA, ROAS) et stocke dans R2.
 """
 import json
+import sentry_sdk
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional, Tuple
 from uuid import UUID
@@ -263,9 +264,11 @@ async def refresh_demographics_for_account(
             print(f"    ✅ {period_days}d: {len(segments)} segments, ${totals['spend']:,.2f} spend")
 
         except MetaAPIError as e:
+            sentry_sdk.capture_exception(e)
             print(f"    ❌ {period_days}d: API error - {e}")
             # Continue avec les autres périodes
         except Exception as e:
+            sentry_sdk.capture_exception(e)
             print(f"    ❌ {period_days}d: Error - {e}")
             # Continue avec les autres périodes
 

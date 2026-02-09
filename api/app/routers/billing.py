@@ -1,6 +1,7 @@
 """
 Router pour Stripe (Checkout + Webhooks)
 """
+import sentry_sdk
 from datetime import datetime
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -105,8 +106,10 @@ async def create_checkout_session(
         return {"checkout_url": checkout_session.url}
 
     except stripe.error.StripeError as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(status_code=502, detail=f"Stripe API error: {str(e)}")
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 

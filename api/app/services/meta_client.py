@@ -11,6 +11,7 @@ import asyncio
 import json
 import random
 import logging
+import sentry_sdk
 from typing import Any, Dict, Optional, Tuple
 import httpx
 from ..config import settings
@@ -632,7 +633,8 @@ class MetaClient:
 
             return results
 
-        except Exception:
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
             return {}
 
     async def get_demographics(

@@ -1,6 +1,7 @@
 """
 Point d'entrée principal de l'API FastAPI
 """
+import sentry_sdk
 from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -101,6 +102,7 @@ async def readyz(db: Session = Depends(get_db)):
         db.execute(text("SELECT 1"))
         checks["database"] = "ok"
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         checks["database"] = f"error: {str(e)[:100]}"
 
     # Check 2: Storage accessibility

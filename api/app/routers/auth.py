@@ -1,6 +1,7 @@
 """
 Router d'authentification Facebook OAuth avec state sécurisé
 """
+import sentry_sdk
 from datetime import datetime, timedelta
 import secrets
 import time
@@ -319,8 +320,10 @@ async def facebook_callback(
         return response
 
     except MetaAPIError as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(status_code=502, detail=f"Meta API error: {str(e)}")
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
@@ -721,7 +724,9 @@ async def sync_facebook_token(
         })
 
     except MetaAPIError as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(status_code=502, detail=f"Meta API error: {str(e)}")
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")

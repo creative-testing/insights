@@ -4,6 +4,7 @@ Router pour servir les données optimisées (proxy vers R2/S3)
 ⚡ OPTIMISÉ: /tenant-aggregated utilise asyncio.gather() pour paralléliser
    les requêtes R2 (80 comptes × 3 fichiers = 240 requêtes en ~2s au lieu de 20s)
 """
+import sentry_sdk
 import asyncio
 from typing import Dict, Any, Tuple, Optional
 from uuid import UUID
@@ -166,6 +167,7 @@ async def get_campaigns(
     try:
         access_token = fernet.decrypt(oauth_token.access_token).decode()
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=500,
             detail=f"Failed to decrypt access token: {str(e)}"
@@ -180,6 +182,7 @@ async def get_campaigns(
             limit=limit
         )
     except MetaAPIError as e:
+        sentry_sdk.capture_exception(e)
         # Si token expiré ou invalide, renvoyer 401
         if "expired" in str(e).lower() or "invalid" in str(e).lower():
             raise HTTPException(
@@ -249,6 +252,7 @@ async def _load_account_data(
             "reason": f"json_error: {str(e)}"
         })
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         return (None, {
             "account_id": account_id,
             "account_name": account_name,
@@ -449,12 +453,14 @@ async def refresh_demographics(
         return result
 
     except DemographicsError as e:
+        sentry_sdk.capture_exception(e)
         # Erreurs métier (account not found, token invalid, etc.)
         raise HTTPException(
             status_code=400,
             detail=str(e)
         )
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         # Erreurs inattendues
         raise HTTPException(
             status_code=500,
