@@ -1285,10 +1285,13 @@
                 return;
             }
 
-            // If already authenticated locally, skip SSO check
+            // If already authenticated locally, redirect to dashboard
             const existingToken = localStorage.getItem('auth_token');
             const existingTenant = localStorage.getItem('tenant_id');
-            if (existingToken && existingTenant) return;
+            if (existingToken && existingTenant) {
+                checkAuthAndRedirect(existingToken, existingTenant);
+                return;
+            }
 
             // Try cross-app SSO: check if there's a shared Supabase session
             if (window.SupabaseAuth && typeof window.SupabaseAuth.checkSSOSession === 'function') {
