@@ -22,8 +22,15 @@ function _isProd() {
     return window.location.hostname.includes('theaipipe.com');
 }
 
+function _deleteHostOnlyCookie(name) {
+    // Delete HostOnly cookie (without domain=) to prevent Cookie Shadowing.
+    // Browsers prioritize HostOnly cookies on the subdomain over shared domain cookies.
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+}
+
 function _setCookie(name, value, days) {
     days = days || 400;
+    _deleteHostOnlyCookie(name);
     var expires = new Date(Date.now() + days * 864e5).toUTCString();
     var domainAttr = _isProd() ? '; domain=' + SSO_COOKIE_DOMAIN : '';
     var secureAttr = window.location.protocol === 'https:' ? '; Secure' : '';
@@ -36,6 +43,7 @@ function _getCookie(name) {
 }
 
 function _deleteCookie(name) {
+    _deleteHostOnlyCookie(name);
     var domainAttr = _isProd() ? '; domain=' + SSO_COOKIE_DOMAIN : '';
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + domainAttr;
 }
@@ -60,16 +68,17 @@ var sharedCookieStorage = {
         return null;
     },
     setItem: function(key, value) {
+        // Clean all old storage first (direct + chunks) to prevent orphans
+        _deleteCookie(key);
+        this._removeChunks(key);
         var encoded = encodeURIComponent(value);
-        if (encoded.length <= 3500) {
-            this._removeChunks(key);
+        if (encoded.length <= 2000) {
             _setCookie(key, value);
         } else {
             var chunks = [];
-            for (var i = 0; i < value.length; i += 3500) {
-                chunks.push(value.slice(i, i + 3500));
+            for (var i = 0; i < value.length; i += 2000) {
+                chunks.push(value.slice(i, i + 2000));
             }
-            _deleteCookie(key);
             _setCookie(key + '.chunk_count', String(chunks.length));
             for (var j = 0; j < chunks.length; j++) {
                 _setCookie(key + '.' + j, chunks[j]);
