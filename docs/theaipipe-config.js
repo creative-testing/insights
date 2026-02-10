@@ -6,7 +6,7 @@
  */
 const THEAIPIPE_CONFIG = {
   urls: {
-    imagen: 'https://imagen.theaipipe.com',
+    imagen: 'https://imagen.theaipipe.com/generate',
     insights: 'https://insights.theaipipe.com',
     scriptwriter: 'https://scriptwriter.theaipipe.com',
   },
