@@ -2,7 +2,7 @@
 Router d'authentification Facebook OAuth avec state sécurisé
 """
 import sentry_sdk
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 import time
 from urllib.parse import urlencode
@@ -184,7 +184,7 @@ async def facebook_callback(
 
         # Chiffrer le token avant l'upsert
         token_encrypted = fernet.encrypt(access_token.encode()).decode()
-        expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+        expires_at = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
 
         # 5. Transaction atomique : tenant → user → token → ad accounts
         with db.begin_nested():  # SAVEPOINT pour rollback partiel si erreur
@@ -511,7 +511,7 @@ async def login_via_supabase(
             detail="Facebook not linked. Please connect your Facebook Ads account."
         )
 
-    if oauth_token.expires_at and oauth_token.expires_at < datetime.utcnow():
+    if oauth_token.expires_at and oauth_token.expires_at < datetime.now(timezone.utc):
         raise HTTPException(
             status_code=403,
             detail="Facebook token expired. Please reconnect your Facebook Ads account."
@@ -603,7 +603,7 @@ async def sync_facebook_token(
 
         # Encrypt token
         token_encrypted = fernet.encrypt(access_token.encode()).decode()
-        expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+        expires_at = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
 
         # 6. Transaction: create/update tenant, user, token, ad accounts
         with db.begin_nested():

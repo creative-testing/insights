@@ -7,7 +7,7 @@ For MVP: logs warnings but doesn't block requests.
 Future: enforce quotas by raising HTTP 429 errors.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
@@ -49,7 +49,7 @@ def check_refresh_quota(tenant_id: UUID, db: Session, enforce: bool = False) -> 
         }
 
     # Count refresh jobs created today
-    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     refresh_count_today = db.execute(
         select(func.count(RefreshJob.id))
         .where(
