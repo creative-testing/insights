@@ -69,27 +69,29 @@ fernet = Fernet(settings.TOKEN_ENCRYPTION_KEY.encode())
 
 
 @router.get("/login")
-async def facebook_login(request: Request, lang: Optional[str] = None):
+async def facebook_login(request: Request, lang: Optional[str] = None, supabase_user_id: Optional[str] = None):
     """
     Initie le flux OAuth Facebook
     Génère un state sécurisé et redirige vers Facebook
     Supporte ?lang=en pour forcer la popup OAuth en anglais
+    Supporte ?supabase_user_id=xxx pour lier le compte Supabase après OAuth
     """
     # Générer state sécurisé pour CSRF protection avec TTL
     state = secrets.token_urlsafe(32)
     request.session["oauth_state"] = {
         "value": state,
         "timestamp": int(time.time()),
-        "lang": lang  # Store lang to preserve it through OAuth flow
+        "lang": lang,  # Store lang to preserve it through OAuth flow
+        "supabase_user_id": supabase_user_id  # Store for linking after callback
     }
 
-    # Paramètres OAuth
+    # Paramètres OAuth (FLfB: permissions come from config_id, not scope)
     params = {
         "client_id": settings.META_APP_ID,
         "redirect_uri": settings.META_REDIRECT_URI,
         "response_type": "code",
         "state": state,
-        "scope": "email,ads_read,public_profile",
+        "config_id": "1053980820279876",  # FLfB configuration: email + ads_read
     }
 
     # Force English locale for Facebook OAuth popup if lang=en
@@ -141,6 +143,9 @@ async def facebook_callback(
 
     # Nettoyer le state de la session
     request.session.pop("oauth_state", None)
+
+    # Extract supabase_user_id from state (for SSO linking flow)
+    supabase_user_id = state_data.get("supabase_user_id") if isinstance(state_data, dict) else None
 
     try:
         # 1. Échanger code contre access token (long-lived, 60 jours)
@@ -206,19 +211,28 @@ async def facebook_callback(
             ).scalar_one()
 
             # 5b. Upsert user (ON CONFLICT DO UPDATE on tenant_id + meta_user_id)
-            stmt = insert(models.User).values(
+            user_values = dict(
                 tenant_id=tenant.id,
                 meta_user_id=meta_user_id,
                 email=user_email,
                 name=user_name,
             )
+            if supabase_user_id:
+                user_values["supabase_user_id"] = supabase_user_id
+
+            stmt = insert(models.User).values(**user_values)
+
+            user_update = {
+                "email": stmt.excluded.email,
+                "name": stmt.excluded.name,
+                "updated_at": func.now(),
+            }
+            if supabase_user_id:
+                user_update["supabase_user_id"] = stmt.excluded.supabase_user_id
+
             stmt = stmt.on_conflict_do_update(
                 index_elements=["tenant_id", "meta_user_id"],
-                set_={
-                    "email": stmt.excluded.email,
-                    "name": stmt.excluded.name,
-                    "updated_at": func.now(),
-                },
+                set_=user_update,
             )
             db.execute(stmt)
             db.flush()
@@ -302,6 +316,10 @@ async def facebook_callback(
         lang_from_session = state_data.get("lang") if isinstance(state_data, dict) else None
         if lang_from_session:
             redirect_url += f"&lang={lang_from_session}"
+
+        # Pass supabase_user_id to dashboard for localStorage persistence
+        if supabase_user_id:
+            redirect_url += f"&supabase_user_id={supabase_user_id}"
 
         response = RedirectResponse(url=redirect_url, status_code=302)
 

@@ -6,7 +6,7 @@
  * 2. Syncing the Facebook token with Insights backend
  * 3. Managing auth state
  *
- * @version 3.1.0
+ * @version 3.2.0
  */
 
 // Sentry helper (SDK loaded via CDN before this script)
@@ -141,40 +141,12 @@ function initSupabase() {
 }
 
 /**
- * Start Facebook login via Supabase Auth
- * Requests ads_read scope for Meta Ads API access
+ * Start Facebook login via backend direct OAuth
+ * Uses backend /auth/facebook/login which includes FLfB config_id
+ * for compatibility with external users (non-app-role)
  */
 async function loginWithFacebook() {
-    if (!_supabaseClient && !initSupabase()) {
-        console.error('Cannot login: Supabase not initialized');
-        // Fallback to direct OAuth
-        window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
-        return;
-    }
-
-    try {
-        const { data, error } = await _supabaseClient.auth.signInWithOAuth({
-            provider: 'facebook',
-            options: {
-                scopes: 'email,ads_read,public_profile',
-                redirectTo: `${window.location.origin}/oauth-callback.html`,
-                queryParams: { config_id: '1053980820279876' }
-            }
-        });
-
-        if (error) {
-            console.error('Supabase OAuth error:', error);
-            _sentryCapture(error.message || error, { flow: 'loginWithFacebook', extra: { errorCode: error.code } });
-            // Fallback to direct OAuth
-            window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
-        }
-        // If successful, user is redirected to Facebook login
-    } catch (err) {
-        console.error('Login error:', err);
-        _sentryCapture(err, { flow: 'loginWithFacebook' });
-        // Fallback to direct OAuth
-        window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
-    }
+    window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
 }
 
 /**
@@ -427,61 +399,36 @@ async function getAccounts() {
 
 /**
  * Link Facebook identity to existing Supabase account
- * Used when user logged in with Google but needs Facebook for Meta Ads API
+ * Used when user logged in via SSO (Google on Imagen/Scriptwriter) but needs
+ * Facebook connected for Meta Ads API access in Insights.
  *
- * Strategy:
- * 1. Check if there's an active Supabase session
- * 2. If YES → use linkIdentity() to add Facebook as second provider
- * 3. If NO → fallback to regular Facebook login via signInWithOAuth()
- *
- * Note: linkIdentity() only works with an active session, otherwise it fails
- * with "Invalid API key" error.
+ * Strategy: Redirect to backend direct OAuth with supabase_user_id param.
+ * Backend includes FLfB config_id for external user compatibility and links
+ * the supabase_user_id to the Insights user record in the callback.
  */
 async function linkFacebookIdentity() {
     if (!_supabaseClient && !initSupabase()) {
         console.error('Cannot link: Supabase not initialized');
-        // Fallback to direct OAuth
         window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
         return;
     }
 
     try {
-        // Check if there's an active Supabase session
         const { data: { session } } = await _supabaseClient.auth.getSession();
 
-        if (session) {
-            // User has active session → use linkIdentity to add Facebook
-            console.log('🔗 Active session found. Using linkIdentity to add Facebook...');
-
-            const { data, error } = await _supabaseClient.auth.linkIdentity({
-                provider: 'facebook',
-                options: {
-                    scopes: 'email,ads_read,public_profile',
-                    redirectTo: `${window.location.origin}/oauth-callback.html`,
-                    queryParams: { config_id: '1053980820279876' }
-                }
-            });
-
-            if (error) {
-                console.error('Link identity error:', error);
-                _sentryCapture(error.message || error, { flow: 'linkFacebook', extra: { errorCode: error.code } });
-                // Fallback to regular login if linking fails
-                console.log('⚠️ Falling back to regular Facebook login...');
-                await loginWithFacebook();
-                return;
-            }
-            // User is redirected to Facebook for authorization...
+        if (session && session.user) {
+            // Pass supabase_user_id so backend links the accounts
+            const supabaseUserId = session.user.id;
+            console.log('[LinkFacebook] Redirecting to backend OAuth with supabase_user_id:', supabaseUserId);
+            window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login?supabase_user_id=${encodeURIComponent(supabaseUserId)}`;
         } else {
-            // No active session → use regular Facebook login
-            console.log('📱 No active session. Using regular Facebook login...');
-            await loginWithFacebook();
+            console.log('[LinkFacebook] No active session, using regular login');
+            window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
         }
     } catch (err) {
-        console.error('Link identity exception:', err);
+        console.error('[LinkFacebook] Error:', err);
         _sentryCapture(err, { flow: 'linkFacebook' });
-        // Fallback to regular login on any error
-        console.log('⚠️ Falling back to regular Facebook login...');
-        await loginWithFacebook();
+        window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
     }
 }
 

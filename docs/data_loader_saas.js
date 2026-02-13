@@ -32,10 +32,13 @@ function getAuthToken() {
         localStorage.setItem('auth_token', token);
         const tenantId = urlParams.get('tenant_id');
         if (tenantId) localStorage.setItem('tenant_id', tenantId);
+        const supabaseUserId = urlParams.get('supabase_user_id');
+        if (supabaseUserId) localStorage.setItem('supabase_user_id', supabaseUserId);
 
         // Clean sensitive params from URL
         urlParams.delete('token');
         urlParams.delete('tenant_id');
+        urlParams.delete('supabase_user_id');
         const newUrl = urlParams.toString()
             ? `${window.location.pathname}?${urlParams.toString()}`
             : window.location.pathname;
