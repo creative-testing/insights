@@ -69,20 +69,29 @@ fernet = Fernet(settings.TOKEN_ENCRYPTION_KEY.encode())
 
 
 @router.get("/login")
-async def facebook_login(request: Request, lang: Optional[str] = None, supabase_user_id: Optional[str] = None):
+async def facebook_login(request: Request, lang: Optional[str] = None, sso_token: Optional[str] = None):
     """
     Initie le flux OAuth Facebook
     Génère un state sécurisé et redirige vers Facebook
     Supporte ?lang=en pour forcer la popup OAuth en anglais
-    Supporte ?supabase_user_id=xxx pour lier le compte Supabase après OAuth
+    Supporte ?sso_token=<jwt> pour lier le compte Supabase après OAuth (CSRF-safe)
     """
+    # Verify SSO token to extract supabase_user_id (cryptographically verified)
+    supabase_user_id = None
+    if sso_token:
+        try:
+            payload = verify_supabase_token(sso_token)
+            supabase_user_id = payload.get("sub")
+        except HTTPException:
+            pass  # Invalid/expired token, proceed without linking
+
     # Générer state sécurisé pour CSRF protection avec TTL
     state = secrets.token_urlsafe(32)
     request.session["oauth_state"] = {
         "value": state,
         "timestamp": int(time.time()),
         "lang": lang,  # Store lang to preserve it through OAuth flow
-        "supabase_user_id": supabase_user_id  # Store for linking after callback
+        "supabase_user_id": supabase_user_id  # Verified UUID, safe to store
     }
 
     # Paramètres OAuth (FLfB: permissions come from config_id, not scope)
@@ -210,7 +219,16 @@ async def facebook_callback(
                 select(models.Tenant).where(models.Tenant.meta_user_id == meta_user_id)
             ).scalar_one()
 
-            # 5b. Upsert user (ON CONFLICT DO UPDATE on tenant_id + meta_user_id)
+            # 5b. Clear orphaned supabase_user_id to prevent UniqueViolation
+            if supabase_user_id:
+                db.execute(
+                    models.User.__table__.update()
+                    .where(models.User.supabase_user_id == supabase_user_id)
+                    .where(models.User.meta_user_id != meta_user_id)
+                    .values(supabase_user_id=None)
+                )
+
+            # 5c. Upsert user (ON CONFLICT DO UPDATE on tenant_id + meta_user_id)
             user_values = dict(
                 tenant_id=tenant.id,
                 meta_user_id=meta_user_id,

@@ -416,11 +416,10 @@ async function linkFacebookIdentity() {
     try {
         const { data: { session } } = await _supabaseClient.auth.getSession();
 
-        if (session && session.user) {
-            // Pass supabase_user_id so backend links the accounts
-            const supabaseUserId = session.user.id;
-            console.log('[LinkFacebook] Redirecting to backend OAuth with supabase_user_id:', supabaseUserId);
-            window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login?supabase_user_id=${encodeURIComponent(supabaseUserId)}`;
+        if (session && session.access_token) {
+            // Pass JWT so backend can cryptographically verify the user (CSRF-safe)
+            console.log('[LinkFacebook] Redirecting to backend OAuth with SSO token');
+            window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login?sso_token=${encodeURIComponent(session.access_token)}`;
         } else {
             console.log('[LinkFacebook] No active session, using regular login');
             window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
