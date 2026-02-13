@@ -6,8 +6,25 @@
  * 2. Syncing the Facebook token with Insights backend
  * 3. Managing auth state
  *
- * @version 2.0.0
+ * @version 3.1.0
  */
+
+// Sentry helper (SDK loaded via CDN before this script)
+function _sentryCapture(error, context) {
+    if (typeof Sentry !== 'undefined') {
+        Sentry.withScope(function(scope) {
+            if (context) {
+                scope.setTag('auth_flow', context.flow || 'unknown');
+                if (context.extra) scope.setExtras(context.extra);
+            }
+            if (error instanceof Error) {
+                Sentry.captureException(error);
+            } else {
+                Sentry.captureMessage(String(error), 'error');
+            }
+        });
+    }
+}
 
 // Supabase Configuration
 const SUPABASE_URL = 'https://romjdysjrgyzhlnrduro.supabase.co';
@@ -140,18 +157,21 @@ async function loginWithFacebook() {
             provider: 'facebook',
             options: {
                 scopes: 'email,ads_read,public_profile',
-                redirectTo: `${window.location.origin}/oauth-callback.html`
+                redirectTo: `${window.location.origin}/oauth-callback.html`,
+                queryParams: { config_id: '1053980820279876' }
             }
         });
 
         if (error) {
             console.error('Supabase OAuth error:', error);
+            _sentryCapture(error.message || error, { flow: 'loginWithFacebook', extra: { errorCode: error.code } });
             // Fallback to direct OAuth
             window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
         }
         // If successful, user is redirected to Facebook login
     } catch (err) {
         console.error('Login error:', err);
+        _sentryCapture(err, { flow: 'loginWithFacebook' });
         // Fallback to direct OAuth
         window.location.href = `${INSIGHTS_API_URL}/api/auth/facebook/login`;
     }
@@ -176,13 +196,22 @@ async function handleSupabaseCallback() {
     // Check for error in hash
     if (hashParams.has('error')) {
         const error = hashParams.get('error_description') || hashParams.get('error');
+        const errorCode = hashParams.get('error');
         console.error('OAuth error in callback:', error);
+        _sentryCapture(`OAuth callback error: ${error}`, {
+            flow: 'oauthCallback',
+            extra: { errorCode, errorDescription: error, fullHash: window.location.hash.substring(0, 500) }
+        });
         return { success: false, error };
     }
 
     if (!supabaseToken || !providerToken) {
         console.error('Missing tokens in callback URL');
         console.log('Available hash params:', [...hashParams.keys()]);
+        _sentryCapture('Missing tokens in OAuth callback', {
+            flow: 'oauthCallback',
+            extra: { hashKeys: [...hashParams.keys()], hasAccessToken: !!supabaseToken, hasProviderToken: !!providerToken }
+        });
         return { success: false, error: 'Missing tokens in callback' };
     }
 
@@ -247,6 +276,7 @@ async function handleSupabaseCallback() {
 
     // ROLLBACK: Sync failed definitively - logout from Supabase to prevent zombie user
     console.error('❌ Sync failed after all retries. Rolling back Supabase session.');
+    _sentryCapture('Sync failed after all retries - rollback', { flow: 'syncFacebook', extra: { attempts: MAX_RETRIES } });
 
     if (_supabaseClient) {
         await _supabaseClient.auth.signOut();
@@ -341,10 +371,12 @@ async function checkSSOSession() {
         }
 
         console.warn('[SSO] Unexpected response:', response.status);
+        _sentryCapture(`SSO unexpected response: ${response.status}`, { flow: 'ssoCheck', extra: { status: response.status } });
         return { authenticated: false, reason: 'backend_error' };
 
     } catch (err) {
         console.error('[SSO] Error:', err);
+        _sentryCapture(err, { flow: 'ssoCheck' });
         return { authenticated: false, reason: 'error' };
     }
 }
@@ -425,12 +457,14 @@ async function linkFacebookIdentity() {
                 provider: 'facebook',
                 options: {
                     scopes: 'email,ads_read,public_profile',
-                    redirectTo: `${window.location.origin}/oauth-callback.html`
+                    redirectTo: `${window.location.origin}/oauth-callback.html`,
+                    queryParams: { config_id: '1053980820279876' }
                 }
             });
 
             if (error) {
                 console.error('Link identity error:', error);
+                _sentryCapture(error.message || error, { flow: 'linkFacebook', extra: { errorCode: error.code } });
                 // Fallback to regular login if linking fails
                 console.log('⚠️ Falling back to regular Facebook login...');
                 await loginWithFacebook();
@@ -444,6 +478,7 @@ async function linkFacebookIdentity() {
         }
     } catch (err) {
         console.error('Link identity exception:', err);
+        _sentryCapture(err, { flow: 'linkFacebook' });
         // Fallback to regular login on any error
         console.log('⚠️ Falling back to regular Facebook login...');
         await loginWithFacebook();

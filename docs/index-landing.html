@@ -6,10 +6,19 @@
     <title>Insights - Optimiza el Rendimiento de tus Anuncios Meta</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script src="i18n/i18n.js"></script>
+    <!-- Sentry Error Tracking -->
+    <script src="https://browser.sentry-cdn.com/8.48.0/bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+      window.Sentry && Sentry.init({
+        dsn: "https://21af48b1a0b8ffe8f9ab04e7c04e55ab@o4508253840146432.ingest.us.sentry.io/4510812267806720",
+        environment: "production",
+        release: "insights-frontend@3.1.0"
+      });
+    </script>
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Supabase Auth Integration (cache-busted) -->
-    <script src="js/supabase-auth.js?v=3.0.0-sso"></script>
+    <script src="js/supabase-auth.js?v=3.1.0-sentry"></script>
     <style>
         * {
             margin: 0;

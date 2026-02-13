@@ -10,6 +10,15 @@
     <!-- Data adapter and SaaS loader -->
     <script src="data_adapter.js"></script>
     <script src="data_loader_saas.js?v=2.1.0"></script>
+    <!-- Sentry Error Tracking -->
+    <script src="https://browser.sentry-cdn.com/8.48.0/bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+      window.Sentry && Sentry.init({
+        dsn: "https://21af48b1a0b8ffe8f9ab04e7c04e55ab@o4508253840146432.ingest.us.sentry.io/4510812267806720",
+        environment: "production",
+        release: "insights-frontend@3.1.0"
+      });
+    </script>
     <!-- i18n support -->
     <script src="i18n/i18n.js"></script>
 </head>
