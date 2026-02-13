@@ -93,6 +93,12 @@
   "footer": {
     "copyright": "© 2025 Insights. All rights reserved."
   },
+  "sso": {
+    "title": "Connection Required",
+    "description": "You are signed in with your unified account. To use <strong>Insights</strong>, we need to connect your <strong>Facebook Ads</strong> account to access your advertising data.",
+    "button": "Link Facebook Account",
+    "helper": "This will link your Facebook account to your existing profile."
+  },
   "oauth": {
     "title": "Connecting...",
     "connecting": "Connecting your account...",

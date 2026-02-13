@@ -93,6 +93,12 @@
   "footer": {
     "copyright": "© 2025 Insights. Alle rechten voorbehouden."
   },
+  "sso": {
+    "title": "Verbinding vereist",
+    "description": "Je bent ingelogd met je gedeelde account. Om <strong>Insights</strong> te gebruiken, moeten we je <strong>Facebook Ads</strong>-account verbinden om toegang te krijgen tot je advertentiegegevens.",
+    "button": "Facebook-account koppelen",
+    "helper": "Dit koppelt je Facebook-account aan je bestaande profiel."
+  },
   "oauth": {
     "title": "Verbinden...",
     "connecting": "Je account verbinden...",

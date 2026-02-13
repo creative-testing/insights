@@ -1244,19 +1244,19 @@
                         <div style="width:64px; height:64px; background:#eff6ff; color:#3b82f6; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px;">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                         </div>
-                        <h2 style="color:#0f172a; font-size:24px; font-weight:800; margin-bottom:12px;">Conexión Requerida</h2>
+                        <h2 style="color:#0f172a; font-size:24px; font-weight:800; margin-bottom:12px;">${t('sso.title')}</h2>
                         <p style="color:#64748b; font-size:16px; line-height:1.6; margin-bottom:32px;">
-                            Estás conectado con tu cuenta unificada. Para usar <strong>Insights</strong>, necesitamos conectar tu cuenta de <strong>Facebook Ads</strong> para acceder a tus datos publicitarios.
+                            ${t('sso.description')}
                         </p>
                         <button onclick="handleLinkFacebook()"
                                 style="background:linear-gradient(135deg, #1877F2 0%, #0d6efd 100%); color:white; border:none; padding:16px 32px; border-radius:12px; font-weight:600; font-size:16px; cursor:pointer; width:100%; transition:transform 0.2s; box-shadow:0 4px 12px rgba(24, 119, 242, 0.3);"
                                 onmouseover="this.style.transform='translateY(-2px)'"
                                 onmouseout="this.style.transform='translateY(0)'">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle; margin-right:8px;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                            Vincular cuenta de Facebook
+                            ${t('sso.button')}
                         </button>
                         <p style="color:#94a3b8; font-size:13px; margin-top:16px;">
-                            Esto vinculará tu cuenta de Facebook a tu perfil existente.
+                            ${t('sso.helper')}
                         </p>
                     </div>
                 </div>
