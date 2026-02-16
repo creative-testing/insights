@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Strategisk Porteføljeanalyse v2 — Daniel Chabert</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F5F3EE;
+            --surface: #FFFFFF;
+            --border: #DDD8CE;
+            --border-light: #EBE8E2;
+            --text: #1C1C28;
+            --text-muted: #71717A;
+            --text-light: #9E9EA8;
+            --accent: #B5432A;
+            --accent-light: #D4654E;
+            --green: #1A7A42;
+            --green-bg: #EFF8F2;
+            --blue: #2B5EA7;
+            --blue-bg: #EDF2FA;
+            --yellow: #A67C00;
+            --yellow-bg: #FDF7E8;
+            --orange: #C47016;
+            --orange-bg: #FEF4E8;
+            --red: #B5432A;
+            --red-bg: #FBF0ED;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body::before {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 32px 80px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            padding: 56px 0 40px;
+            border-bottom: 2px solid var(--text);
+        }
+
+        .report-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-label::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .v2-tag {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-left: 4px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 17px;
+            color: var(--text-muted);
+            max-width: 620px;
+            line-height: 1.6;
+        }
+
+        .date-range {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── KPI STRIP ── */
+        .kpi-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-bottom: 1px solid var(--border);
+            margin: 0;
+        }
+
+        .kpi-item {
+            padding: 32px 0;
+            border-right: 1px solid var(--border);
+        }
+
+        .kpi-item:last-child { border-right: none; }
+        .kpi-item:first-child { padding-right: 24px; }
+        .kpi-item:not(:first-child):not(:last-child) { padding: 32px 24px; }
+        .kpi-item:last-child { padding-left: 24px; }
+
+        .kpi-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--text);
+            line-height: 1.1;
+        }
+
+        .kpi-value.alert { color: var(--red); }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        /* ── METHODOLOGY NOTE ── */
+        .method-note {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            padding: 24px 28px;
+            margin: 48px 0 0;
+        }
+
+        .method-note-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .method-note p {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+
+        .method-note strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* ── SECTIONS ── */
+        .section {
+            margin: 56px 0 0;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tier-badge {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .tier-badge.t1 { color: var(--green); }
+        .tier-badge.t2 { color: var(--blue); }
+        .tier-badge.t3 { color: var(--yellow); }
+        .tier-badge.t4 { color: var(--red); }
+        .tier-badge.lead { color: var(--orange); }
+        .tier-badge.rec { color: var(--accent); }
+        .tier-badge.pillar { color: var(--accent); }
+
+        h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: var(--text);
+            line-height: 1.25;
+        }
+
+        h2 .tier-sub {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 4px;
+            letter-spacing: 0;
+        }
+
+        /* ── TABLES ── */
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            color: var(--text-light);
+            font-weight: 700;
+            border-bottom: 2px solid var(--text);
+            background: transparent;
+        }
+
+        thead th:last-child,
+        tbody td:last-child {
+            text-align: right;
+            padding-right: 24px;
+        }
+
+        tbody td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 14px;
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFAF7; }
+
+        .account-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .currency-tag {
+            font-size: 10px;
+            color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border);
+            padding: 1px 6px;
+            margin-left: 8px;
+        }
+
+        .cpa-good { color: var(--green); font-weight: 700; }
+        .cpa-ok { color: var(--blue); font-weight: 700; }
+        .cpa-warn { color: var(--yellow); font-weight: 700; }
+        .cpa-bad { color: var(--red); font-weight: 700; }
+
+        .verdict {
+            font-size: 11.5px;
+            padding: 3px 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+
+        .verdict.scale { background: var(--green-bg); color: var(--green); }
+        .verdict.maintain { background: var(--blue-bg); color: var(--blue); }
+        .verdict.watch { background: var(--yellow-bg); color: var(--yellow); }
+        .verdict.action { background: var(--red-bg); color: var(--red); }
+        .verdict.check { background: var(--orange-bg); color: var(--orange); }
+
+        /* ── FUNNEL BARS ── */
+        .bar-track {
+            width: 100%;
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .bar-fill.red { background: var(--red); }
+        .bar-fill.orange { background: var(--orange); }
+        .bar-fill.yellow { background: var(--yellow); }
+        .bar-fill.green { background: var(--green); }
+        .bar-fill.blue { background: var(--blue); }
+
+        .bar-label {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .bar-label .pct { font-family: 'DM Sans', sans-serif; }
+        .bar-label .pct.red { color: var(--red); }
+        .bar-label .pct.orange { color: var(--orange); }
+        .bar-label .pct.yellow { color: var(--yellow); }
+
+        .bar-cell { min-width: 120px; }
+
+        /* ── TREND INDICATORS ── */
+        .trend-improving { color: var(--green); font-weight: 700; }
+        .trend-stable { color: var(--blue); font-weight: 700; }
+        .trend-declining { color: var(--red); font-weight: 700; }
+
+        .trend-arrow {
+            font-size: 16px;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        /* ── SPOTLIGHT ── */
+        .spotlight {
+            background: var(--red-bg);
+            border: 1px solid var(--red);
+            border-left: 4px solid var(--red);
+            padding: 28px 32px;
+            margin-top: 24px;
+        }
+
+        .spotlight.opportunity {
+            background: var(--green-bg);
+            border-color: var(--green);
+        }
+
+        .spotlight-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .spotlight .spotlight-label { color: var(--red); }
+        .spotlight.opportunity .spotlight-label { color: var(--green); }
+
+        .spotlight-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+
+        .spotlight-body {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+
+        .spotlight-body strong { color: var(--text); font-weight: 600; }
+
+        .spotlight-number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 12px 0 4px;
+        }
+
+        .spotlight .spotlight-number { color: var(--red); }
+        .spotlight.opportunity .spotlight-number { color: var(--green); }
+
+        /* ── FUNNEL SUMMARY ── */
+        .funnel-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin: 32px 0 0;
+        }
+
+        .funnel-step {
+            padding: 24px 20px;
+            border-right: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+        }
+
+        .funnel-step:last-child { border-right: none; }
+
+        .funnel-step::after {
+            content: '\2192';
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: var(--text-light);
+            z-index: 1;
+        }
+
+        .funnel-step:last-child::after { display: none; }
+
+        .funnel-step-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .funnel-step-value {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .funnel-step-drop {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* ── AOV GROUPS ── */
+        .aov-group {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px 28px;
+            margin-top: 16px;
+        }
+
+        .aov-group-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .aov-group.safe .aov-group-title { color: var(--green); }
+        .aov-group.verify .aov-group-title { color: var(--yellow); }
+        .aov-group.risk .aov-group-title { color: var(--red); }
+
+        .aov-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 14px;
+        }
+
+        .aov-row:last-child { border-bottom: none; }
+
+        .aov-account { font-weight: 600; color: var(--text); flex: 1; }
+
+        .aov-cpa {
+            width: 120px;
+            text-align: right;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .aov-required {
+            width: 160px;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .aov-required.safe { color: var(--green); }
+        .aov-required.verify { color: var(--yellow); }
+        .aov-required.risk { color: var(--red); }
+
+        /* ── ANOMALY CARDS ── */
+        .anomaly-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .anomaly-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px;
+        }
+
+        .anomaly-card .anomaly-icon {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .anomaly-card.warning .anomaly-icon { color: var(--orange); }
+        .anomaly-card.critical .anomaly-icon { color: var(--red); }
+        .anomaly-card.info .anomaly-icon { color: var(--blue); }
+
+        .anomaly-card h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .anomaly-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        .anomaly-card p strong { color: var(--text); }
+
+        /* ── RECOMMENDATIONS ── */
+        .rec-grid {
+            display: grid;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .rec-card {
+            background: var(--surface);
+            padding: 32px;
+            position: relative;
+        }
+
+        .rec-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .rec-card.urgent::before { background: var(--red); }
+        .rec-card.opportunity::before { background: var(--green); }
+        .rec-card.warning::before { background: var(--orange); }
+        .rec-card.default::before { background: var(--blue); }
+
+        .rec-number {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .rec-card.urgent .rec-number { color: var(--red); }
+        .rec-card.opportunity .rec-number { color: var(--green); }
+        .rec-card.warning .rec-number { color: var(--orange); }
+        .rec-card.default .rec-number { color: var(--blue); }
+
+        .rec-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            line-height: 1.3;
+            color: var(--text);
+        }
+
+        .rec-body {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+        .rec-body strong { color: var(--text); font-weight: 600; }
+
+        .highlight-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 20px 24px;
+            margin-top: 18px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-muted);
+        }
+
+        .highlight-box strong { color: var(--text); }
+
+        .highlight-box .number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--green);
+        }
+
+        .highlight-box .number.red { color: var(--red); }
+
+        /* ── DIVIDER ── */
+        .divider { height: 2px; background: var(--text); margin: 56px 0 0; }
+
+        /* ── SUMMARY ── */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+            margin-top: 32px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .summary-card {
+            padding: 28px;
+            border-right: 1px solid var(--border);
+        }
+
+        .summary-card:last-child { border-right: none; }
+
+        .summary-card h3 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .summary-card:nth-child(1) h3 { color: var(--green); }
+        .summary-card:nth-child(2) h3 { color: var(--red); }
+        .summary-card:nth-child(3) h3 { color: var(--blue); }
+
+        .summary-card ul {
+            list-style: none;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .summary-card li { padding: 5px 0; }
+        .summary-card li strong { color: var(--text); font-weight: 600; }
+
+        /* ── DORMANT ── */
+        .dormant-section { margin-top: 48px; }
+
+        .dormant-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .dormant-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .dormant-tag {
+            font-size: 11px;
+            color: var(--text-light);
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-weight: 500;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: 2px solid var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .footer-left { flex: 1; }
+
+        .footer-brand {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .footer-brand span { color: var(--accent); }
+
+        .footer-text {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .footer-right { text-align: right; }
+
+        .footer-meta {
+            font-size: 11px;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .container { padding: 0 20px 60px; }
+            .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+            .kpi-item { border-right: none; border-bottom: 1px solid var(--border); padding: 20px 0 !important; }
+            .kpi-item:nth-child(odd) { padding-right: 16px !important; border-right: 1px solid var(--border); }
+            .kpi-item:nth-child(even) { padding-left: 16px !important; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .summary-card { border-right: none; border-bottom: 1px solid var(--border); }
+            .summary-card:last-child { border-bottom: none; }
+            .funnel-summary { grid-template-columns: repeat(2, 1fr); }
+            .funnel-step:nth-child(2)::after { display: none; }
+            .funnel-step { border-bottom: 1px solid var(--border); }
+            .anomaly-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 32px; }
+            .kpi-value { font-size: 28px; }
+            .table-wrap { overflow-x: auto; }
+            table { min-width: 650px; }
+            .footer { flex-direction: column; gap: 24px; }
+            .footer-right { text-align: left; }
+            .rec-card { padding: 24px; }
+        }
+
+        @media print {
+            body::before { display: none; }
+            .container { max-width: 100%; padding: 0; }
+            .section { break-inside: avoid; }
+            .rec-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- HEADER                                      -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="header">
+            <div class="report-label">AI-Genereret Strategisk Rapport <span class="v2-tag">V2</span></div>
+            <h1>Dybdeg&aring;ende Portef&oslash;ljeanalyse</h1>
+            <p class="subtitle">Fuld funnel-diagnostik, momentum-analyse og optimeringsmuligheder p&aring; tv&aelig;rs af 21 aktive annoncekonti &mdash; baseret p&aring; 97.000+ klik og 1.960 k&oslash;b</p>
+            <p class="date-range">Periode: 1. januar &mdash; 16. februar 2026 &middot; 47 dage &middot; Genereret af AI med live Meta Ads-data</p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- KPI STRIP                                   -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="kpi-strip">
+            <div class="kpi-item">
+                <div class="kpi-label">Samlet forbrug</div>
+                <div class="kpi-value">$80K</div>
+                <div class="kpi-sub">21 aktive konti &middot; 47 dage</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">E-commerce k&oslash;b</div>
+                <div class="kpi-value">1.960</div>
+                <div class="kpi-sub">16 konti med k&oslash;bsdata</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Fantomklik</div>
+                <div class="kpi-value alert">26%</div>
+                <div class="kpi-sub">~25.000 klik der aldrig ankom</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Checkout-frafald</div>
+                <div class="kpi-value alert">66%</div>
+                <div class="kpi-sub">5.680 forladte kurve</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- METHODOLOGY v2                              -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="method-note">
+            <div class="method-note-title">V2: Fra CPA til fuld funnel-analyse</div>
+            <p>
+                Version 1 rangerede konti udelukkende p&aring; <strong>CPA (Cost Per Acquisition)</strong>. Version 2 g&aring;r langt dybere: vi analyserer <strong>hele k&oslash;bstragten</strong> fra klik til k&oslash;b, finder pr&aelig;cis hvor kunderne falder fra, sp&aring;rer momentum (stiger eller falder CPA?), og identificerer spildt budget p&aring; d&aring;rlige placeringer.
+                <br><br>
+                <strong>Vigtig begr&aelig;nsning:</strong> ROAS-data (Return On Ad Spend) er fortsat ikke tilg&aelig;ngelig via API. Uden oms&aelig;tningsdata kan vi ikke vurdere, om en h&oslash;j CPA er profitabel. Vi indf&oslash;rer derfor en <strong>&ldquo;N&oslash;dvendig Ordrev&aelig;rdi&rdquo;</strong>-analyse, der viser, hvad hvert produkt skal koste for at v&aelig;re rentabelt ved 3x ROAS.
+            </p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- EXECUTIVE SUMMARY                           -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge t1">Resum&eacute;</div>
+                <h2>Sammenfattende Oversigt</h2>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Skal&eacute;r</h3>
+                    <ul>
+                        <li><strong>Nature's Body</strong> &mdash; CPA &darr;26%, stjerneperformer</li>
+                        <li><strong>Kirkensgaard</strong> &mdash; Bedste funnel-sundhed</li>
+                        <li><strong>Fenjas Farver</strong> &mdash; Laveste CPA (efter checkout-fix)</li>
+                        <li><strong>Trovedo</strong> &mdash; Fremragende lead gen ($3/lead)</li>
+                    </ul>
+                </div>
+                <div class="summary-card">
+                    <h3>Fix Omg&aring;ende</h3>
+                    <ul>
+                        <li><strong>Woods Copenhagen</strong> &mdash; 61,6% fantomklik</li>
+                        <li><strong>Fenjas Farver</strong> &mdash; 86,3% checkout-frafald</li>
+                        <li><strong>Luvoring</strong> &mdash; Forkert kampagnem&aring;l</li>
+                        <li><strong>TrailCam.dk</strong> &mdash; Faldende + ingen aktive kamp.</li>
+                        <li><strong>Beautytale</strong> &mdash; 81,6% checkout-frafald</li>
+                        <li><strong>Copenhagen-Comfort</strong> &mdash; CPA tredoblet</li>
+                    </ul>
+                </div>
+                <div class="summary-card">
+                    <h3>St&oslash;rste l&oslash;ftestang</h3>
+                    <ul>
+                        <li>Fix checkout-flows (5.680 forladte kurve)</li>
+                        <li>Fix langsomme landingssider (~$20K spildt)</li>
+                        <li>Fjern Audience Network for Nature's Body</li>
+                        <li>Skift Luvoring til SALES-m&aring;l</li>
+                        <li>Skal&eacute;r Kirkensgaard + Nature's Body</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- RECOMMENDATIONS                             -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge rec">Strategiske Anbefalinger</div>
+                <h2>8 Datadrevne Handlinger <span class="tier-sub">Prioriteret efter estimeret effekt p&aring; portef&oslash;ljens performance</span></h2>
+            </div>
+
+            <div class="rec-grid">
+
+                <div class="rec-card urgent">
+                    <div class="rec-number">01 &mdash; H&oslash;jeste Prioritet</div>
+                    <div class="rec-title">Fix Fenjas Farvers checkout: 2.861 forladte kurve</div>
+                    <div class="rec-body">
+                        Fenjas Farver har portef&oslash;ljens <strong>laveste CPA (39 kr)</strong> og en fantastisk IC&rarr;K&oslash;b-rate p&aring; 85,5%. Men 86,3% af alle &ldquo;tilf&oslash;j til kurv&rdquo; (3.315 kunder!) forlader uden at starte checkout. <strong>Det er ikke et annonceproblem &mdash; det er et webshop-problem.</strong>
+                        <br><br>
+                        <strong>Tjek:</strong> Forventningsafstemning p&aring; fragt/pris, checkout-flow p&aring; mobil, betalingsmetoder, &ldquo;g&aelig;stecheckout&rdquo;-mulighed.
+                        <div class="highlight-box">
+                            <strong>Potentiel effekt:</strong> Hvis bare 10% flere af de forladte kurve konverteres = <span class="number">+245 k&oslash;b</span> uden &eacute;n ekstra annoncekrone. Med Fenjas Farvers CPA p&aring; 39 kr ville det have kostet <strong>9.555 kr ($1.346) i annoncer</strong> for de samme k&oslash;b.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rec-card urgent">
+                    <div class="rec-number">02 &mdash; Akut</div>
+                    <div class="rec-title">Woods Copenhagen: 61,6% af alle klik er fantomklik</div>
+                    <div class="rec-body">
+                        Hver gang en bruger klikker p&aring; Woods Copenhagens annonce, n&aring;r <strong>kun 38 ud af 100</strong> faktisk frem til landingssiden. Med et CPC p&aring; 3,77 kr betaler du for klik der aldrig ankommer.
+                        <br><br>
+                        <strong>&Aring;rsag med h&oslash;j sandsynlighed:</strong> Langsom landingsside. Mobil f&oslash;rst &mdash; test indl&aelig;sningstid p&aring; Google PageSpeed Insights. Reducer billeder, JavaScript og third-party scripts.
+                        <br><br>
+                        <strong>Bemærk:</strong> Woods Copenhagen genererer ogs&aring; <strong>830 leads</strong> &mdash; kontoen har v&aelig;rdi, men taber enorme m&aelig;ngder trafik inden den kan konvertere.
+                    </div>
+                </div>
+
+                <div class="rec-card opportunity">
+                    <div class="rec-number">03 &mdash; St&oslash;rste mulighed</div>
+                    <div class="rec-title">Skal&eacute;r Nature's Body &mdash; og fjern Audience Network</div>
+                    <div class="rec-body">
+                        Nature's Body er portef&oslash;ljens stjerneperformer: <strong>CPA faldt 26%</strong> (A$45 &rarr; A$34) mens budgettet steg 51%. K&oslash;bene gik fra 127 til 259. Det er sj&aelig;ldent og v&aelig;rdifuldt.
+                        <br><br>
+                        <strong>Men:</strong> 9,3% af budgettet g&aring;r til Audience Network, som leverer kun 0,8% af k&oslash;bene. <strong>Flyt de ~A$1.340 til Facebook/Instagram</strong> for potentielt ~33 ekstra k&oslash;b.
+                        <br><br>
+                        <strong>Advarsel:</strong> Frekvens er 6,99 &mdash; t&aelig;t p&aring; ad fatigue. Overv&aring;g dagligt og hav nye creatives klar.
+                    </div>
+                </div>
+
+                <div class="rec-card warning">
+                    <div class="rec-number">04 &mdash; Advarsel</div>
+                    <div class="rec-title">CreativeCarve: CPA fordoblet p&aring; 3 uger</div>
+                    <div class="rec-body">
+                        Portef&oslash;ljens st&oslash;rste konto ($12.272) viser en bekymrende trend: CPA steg fra <strong>184 kr i januar</strong> til <strong>397 kr i februar</strong> (+116%). Budgettet steg 2,7x men k&oslash;bene steg kun 24% (129 &rarr; 160).
+                        <br><br>
+                        <strong>Mulige &aring;rsager:</strong> Ad fatigue (frekvens 3,37), for hurtig skalering, auktionspres. <strong>Handling:</strong> Lav 3-4 nye creative-variationer, test nye m&aring;lgrupper, overv&oslash;j at reducere budget 20-30% midlertidigt.
+                    </div>
+                </div>
+
+                <div class="rec-card warning">
+                    <div class="rec-number">05 &mdash; Advarsel</div>
+                    <div class="rec-title">TrailCam.dk: K&oslash;b faldt 37% p&aring; fladt budget</div>
+                    <div class="rec-body">
+                        TrailCam.dk brugte n&aelig;sten det samme i begge halvdele (~32.000 kr), men k&oslash;bene faldt fra <strong>75 til 47</strong>. CPA steg fra 432 kr til 681 kr (+58%).
+                        <br><br>
+                        Desuden: <strong>ingen aktive kampagner fundet</strong> i systemet. Kampagnestrukturen b&oslash;r unders&oslash;ges omg&aring;ende. Er kampagnerne paused? K&oslash;rer de via en ukonventionel setup?
+                    </div>
+                </div>
+
+                <div class="rec-card default">
+                    <div class="rec-number">06 &mdash; Optimering</div>
+                    <div class="rec-title">Luvoring: Skift kampagnem&aring;l fra LINK_CLICKS til SALES</div>
+                    <div class="rec-body">
+                        Luvorings 2 aktive kampagner bruger <strong>LINK_CLICKS-m&aring;let</strong> (oprettet august 2025). Det betyder, at Metas algoritme optimerer for folk der <em>klikker</em>, ikke folk der <em>k&oslash;ber</em>. Det forklarer ogs&aring; det enorme checkout-frafald (72,9%): de tiltr&aelig;kker de forkerte brugere.
+                        <br><br>
+                        <strong>Handling:</strong> Opret en ny kampagne med OUTCOME_SALES og gradvist flyt budget fra de gamle kampagner.
+                    </div>
+                </div>
+
+                <div class="rec-card default">
+                    <div class="rec-number">07 &mdash; Strategisk</div>
+                    <div class="rec-title">Fix betalingsprocessen for Scandinavian Ease</div>
+                    <div class="rec-body">
+                        Scandinavian Ease har en n&aelig;sten perfekt kurv-til-checkout-rate (92%) &mdash; kunderne <em>vil</em> k&oslash;be. Men <strong>74% falder fra under selve betalingen</strong> (kun 6 k&oslash;b af 23 checkouts).
+                        <br><br>
+                        <strong>&Aring;rsager:</strong> Manglende betalingsmetoder (MobilePay?), tekniske fejl i betalingsgateway, for mange formularfelter. Samme m&oslash;nster ses hos Copenhagen-Comfort (52% tab) og Luna Bloom (61% tab).
+                    </div>
+                </div>
+
+                <div class="rec-card default">
+                    <div class="rec-number">08 &mdash; Portef&oslash;lje</div>
+                    <div class="rec-title">Skalér Kirkensgaard: Bedste funnel-sundhed i porteføljen</div>
+                    <div class="rec-body">
+                        Kirkensgaard har den st&aelig;rkeste kombination i portef&oslash;ljen: <strong>lav CPA (116 kr), lav fantomklik-rate (12,8%), h&oslash;jeste CTR (6,27%)</strong> og kun $1.207 i forbrug. Kontoen er underinvesteret.
+                        <br><br>
+                        Med en n&oslash;dvendig AOV p&aring; kun 348 kr for 3x ROAS er denne konto sandsynligvis den mest p&aring;lidelige mulighed for budgetfor&oslash;gelse.
+                        <div class="highlight-box">
+                            <strong>Forslag:</strong> Fordobl budgettet som test. Overv&aring;g CPA dagligt. Har Fenjas Farver og Kirkensgaard sammen potentiale til at v&aelig;re portef&oslash;ljens to &ldquo;sikre sk&aring;lere&rdquo;.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PORTFOLIO FUNNEL OVERVIEW                   -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge pillar">Portef&oslash;ljens Tragt</div>
+                <h2>S&aring;dan str&oslash;mmer 97.000 klik gennem tragten <span class="tier-sub">Aggregeret for alle 16 e-commerce konti</span></h2>
+            </div>
+
+            <div class="funnel-summary">
+                <div class="funnel-step">
+                    <div class="funnel-step-label">Klik</div>
+                    <div class="funnel-step-value">97.197</div>
+                    <div class="funnel-step-drop" style="color: var(--text-light);">100%</div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-step-label">Landingsside</div>
+                    <div class="funnel-step-value">72.024</div>
+                    <div class="funnel-step-drop" style="color: var(--red);">&minus;26% fantomklik</div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-step-label">Tilf&oslash;j til kurv</div>
+                    <div class="funnel-step-value">8.628</div>
+                    <div class="funnel-step-drop" style="color: var(--text-light);">12% af LPV</div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-step-label">K&oslash;b</div>
+                    <div class="funnel-step-value">1.960</div>
+                    <div class="funnel-step-drop" style="color: var(--red);">23% af ATC</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PILLAR 1: FUNNEL FRICTION                   -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge pillar">01 &mdash; Funnel-Friktion</div>
+                <h2>Hvor mister vi kunder? <span class="tier-sub">Tre kritiske lækager identificeret i hele porteføljen</span></h2>
+            </div>
+
+            <!-- Ghost Click Bleed -->
+            <div style="margin-top: 8px;">
+                <h3 style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; padding-left: 4px;">
+                    Fantomklik &mdash; klik der aldrig n&aring;r landingssiden
+                </h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; padding-left: 4px; line-height: 1.6;">
+                    N&aring;r en bruger klikker p&aring; din annonce, men aldrig indl&aelig;ser landingssiden, betaler du for et klik uden v&aelig;rdi. &Aring;rsager: langsom mobilside, tung JavaScript, d&aring;rlig hosting, eller brugeren lukker f&oslash;r siden indl&aelig;ses.
+                </p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>Klik</th>
+                            <th>LPV</th>
+                            <th>Tab</th>
+                            <th>Friktionstab</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">Woods Copenhagen</span> <span class="currency-tag">DKK</span></td>
+                            <td>5.003</td>
+                            <td>1.920</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">61,6%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 61.6%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">Kritisk</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Fenjas Farver</span> <span class="currency-tag">DKK</span></td>
+                            <td>11.488</td>
+                            <td>5.089</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">55,7%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 55.7%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">Lavt CPC (0,76) mildner</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Beauty4me</span> <span class="currency-tag">DKK</span></td>
+                            <td>3.264</td>
+                            <td>1.907</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct orange">41,6%</span></div>
+                                    <div class="bar-track"><div class="bar-fill orange" style="width: 41.6%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">H&oslash;j</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Trendlights</span> <span class="currency-tag">DKK</span></td>
+                            <td>5.356</td>
+                            <td>3.901</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct yellow">27,2%</span></div>
+                                    <div class="bar-track"><div class="bar-fill yellow" style="width: 27.2%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">Moderat</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Copenhagen-Comfort</span> <span class="currency-tag">DKK</span></td>
+                            <td>6.098</td>
+                            <td>4.531</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct yellow">25,7%</span></div>
+                                    <div class="bar-track"><div class="bar-fill yellow" style="width: 25.7%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">Moderat</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Beautytale</span> <span class="currency-tag">DKK</span></td>
+                            <td>3.614</td>
+                            <td>2.727</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct yellow">24,5%</span></div>
+                                    <div class="bar-track"><div class="bar-fill yellow" style="width: 24.5%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">Moderat</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 12px; color: var(--text-light); margin-top: 8px; padding-left: 4px;">
+                Portef&oslash;ljens gennemsnit: 26%. Bedste konti: Nomods (3,4%), Kirkensgaard (12,8%), Luvoring (15,2%). De 10 &oslash;vrige konti ligger mellem 15-23%.
+            </p>
+
+            <!-- Checkout Abandonment -->
+            <div style="margin-top: 40px;">
+                <h3 style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; padding-left: 4px;">
+                    Checkout-frafald &mdash; fra kurv til checkout
+                </h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; padding-left: 4px; line-height: 1.6;">
+                    Kunder tilf&oslash;jer produkter til kurven men starter aldrig checkout. &Aring;rsager: uventet pris/fragt, kompliceret checkout-flow, manglende tillid, d&aring;rlig mobiloplevelse.
+                </p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>Tilf&oslash;j kurv</th>
+                            <th>Start checkout</th>
+                            <th>Frafald</th>
+                            <th>Signal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">Fenjas Farver</span></td>
+                            <td><strong>3.315</strong></td>
+                            <td>454</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">86,3%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 86.3%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">2.861 tabte</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Beautytale</span></td>
+                            <td><strong>315</strong></td>
+                            <td>58</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">81,6%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 81.6%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">257 tabte</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Beauty4me</span></td>
+                            <td><strong>64</strong></td>
+                            <td>12</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">81,3%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 81.3%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">52 tabte</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Luvoring</span></td>
+                            <td><strong>878</strong></td>
+                            <td>238</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">72,9%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 72.9%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">640 tabte</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Nomods</span></td>
+                            <td><strong>46</strong></td>
+                            <td>16</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct orange">65,2%</span></div>
+                                    <div class="bar-track"><div class="bar-fill orange" style="width: 65.2%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">30 tabte</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="spotlight" style="margin-top: 24px;">
+                <div class="spotlight-label">St&oslash;rste mulighed i hele portef&oslash;ljen</div>
+                <div class="spotlight-title">Fenjas Farver: 3.315 tilf&oslash;jet til kurv, kun 454 starter checkout</div>
+                <div class="spotlight-body">
+                    Fenjas Farver har portef&oslash;ljens laveste CPA (39 kr) og en fremragende IC&rarr;K&oslash;b-rate p&aring; 85,5%. Problemet er <strong>kun</strong> i kurv-til-checkout-trinnet. Af de 2.861 kunder der forlader kurven, ville <strong>bare 10% ekstra konvertering</strong> betyde:
+                    <div class="spotlight-number">+245 k&oslash;b</div>
+                    <strong>Uden &eacute;n ekstra annoncekrone.</strong> Det kr&aelig;ver en bedre checkout-oplevelse p&aring; webshoppen, ikke bedre annoncer.
+                </div>
+            </div>
+
+            <!-- Payment Leak -->
+            <div style="margin-top: 40px;">
+                <h3 style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; padding-left: 4px;">
+                    Betalingsfrafald &mdash; fra checkout til k&oslash;b
+                </h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; padding-left: 4px; line-height: 1.6;">
+                    Kunder der starter checkout men aldrig f&aelig;rdigg&oslash;r k&oslash;bet. &Aring;rsager: betalingsmetoder mangler, tekniske fejl, sikkerhedsbekymringer, formularproblemer.
+                </p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>Start checkout</th>
+                            <th>K&oslash;b</th>
+                            <th>Gennemf&oslash;rsel</th>
+                            <th>Signal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">Scandinavian Ease</span></td>
+                            <td>23</td>
+                            <td>6</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">26,1%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 26.1%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">Kritisk &mdash; 74% tabes</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Luna Bloom</span></td>
+                            <td>23</td>
+                            <td>9</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct red">39,1%</span></div>
+                                    <div class="bar-track"><div class="bar-fill red" style="width: 39.1%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict action">61% tabes</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Nomods</span></td>
+                            <td>16</td>
+                            <td>7</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct orange">43,8%</span></div>
+                                    <div class="bar-track"><div class="bar-fill orange" style="width: 43.8%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">56% tabes</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Copenhagen-Comfort</span></td>
+                            <td>161</td>
+                            <td>78</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct orange">48,4%</span></div>
+                                    <div class="bar-track"><div class="bar-fill orange" style="width: 48.4%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">52% tabes</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">CreativeCarve</span></td>
+                            <td>565</td>
+                            <td>289</td>
+                            <td>
+                                <div class="bar-cell">
+                                    <div class="bar-label"><span class="pct yellow">51,2%</span></div>
+                                    <div class="bar-track"><div class="bar-fill yellow" style="width: 51.2%"></div></div>
+                                </div>
+                            </td>
+                            <td><span class="verdict watch">49% tabes</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 12px; color: var(--text-light); margin-top: 8px; padding-left: 4px;">
+                Bedste konti: Fenjas Farver (85,5%), Nature's Body (77,4%), Luvoring (71,8%). Portef&oslash;ljens gennemsnit: 66,5%.
+            </p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PILLAR 2: MOMENTUM                          -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge pillar">02 &mdash; Momentum</div>
+                <h2>Hvem accelererer, hvem falder? <span class="tier-sub">CPA-udvikling for de 5 st&oslash;rste konti: f&oslash;rste halvdel (1-23 jan) vs. anden halvdel (24 jan &ndash; 16 feb)</span></h2>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>H1: Forbrug / K&oslash;b / CPA</th>
+                            <th>H2: Forbrug / K&oslash;b / CPA</th>
+                            <th>CPA-&aelig;ndring</th>
+                            <th>Signal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">Nature's Body</span> <span class="currency-tag">AUD</span></td>
+                            <td>A$5.752 &middot; 127 k&oslash;b &middot; <strong>A$45</strong></td>
+                            <td>A$8.687 &middot; 259 k&oslash;b &middot; <strong>A$34</strong></td>
+                            <td class="trend-improving"><span class="trend-arrow">&darr;</span> &minus;26%</td>
+                            <td><span class="verdict scale">Stjerne &starf;</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Luvoring</span> <span class="currency-tag">DKK</span></td>
+                            <td>24.152 kr &middot; 64 k&oslash;b &middot; <strong>377 kr</strong></td>
+                            <td>44.667 kr &middot; 107 k&oslash;b &middot; <strong>417 kr</strong></td>
+                            <td class="trend-stable"><span class="trend-arrow">&rarr;</span> +11%</td>
+                            <td><span class="verdict maintain">Stabil skalering</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">CreativeCarve</span> <span class="currency-tag">DKK</span></td>
+                            <td>23.707 kr &middot; 129 k&oslash;b &middot; <strong>184 kr</strong></td>
+                            <td>63.439 kr &middot; 160 k&oslash;b &middot; <strong>397 kr</strong></td>
+                            <td class="trend-declining"><span class="trend-arrow">&uarr;</span> +116%</td>
+                            <td><span class="verdict action">CPA fordoblet</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">TrailCam.dk</span> <span class="currency-tag">DKK</span></td>
+                            <td>32.375 kr &middot; 75 k&oslash;b &middot; <strong>432 kr</strong></td>
+                            <td>31.997 kr &middot; 47 k&oslash;b &middot; <strong>681 kr</strong></td>
+                            <td class="trend-declining"><span class="trend-arrow">&uarr;</span> +58%</td>
+                            <td><span class="verdict action">Faldende &darr;</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Copenhagen-Comfort</span> <span class="currency-tag">DKK</span></td>
+                            <td>7.453 kr &middot; 28 k&oslash;b &middot; <strong>266 kr</strong></td>
+                            <td>33.000 kr &middot; 50 k&oslash;b &middot; <strong>660 kr</strong></td>
+                            <td class="trend-declining"><span class="trend-arrow">&uarr;</span> +148%</td>
+                            <td><span class="verdict action">For hurtig skalering</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="spotlight opportunity" style="margin-top: 24px;">
+                <div class="spotlight-label">Stjerneperformer</div>
+                <div class="spotlight-title">Nature's Body: CPA faldt 26% mens budgettet steg 51%</div>
+                <div class="spotlight-body">
+                    Dette er det modsatte af, hvad der normalt sker ved skalering. N&aring;r budget &oslash;ges, stiger CPA typisk. Nature's Body <strong>forbedrede</strong> sin CPA fra A$45 til A$34, samtidig med at antallet af k&oslash;b steg fra 127 til 259 &mdash; mere end en fordobling.
+                    <br><br>
+                    <strong>Konklusion:</strong> Denne konto er i &ldquo;sweet spot&rdquo; og b&oslash;r skaleres yderligere. De to aktive Valentine's Day-kampagner performer tydeligt. <em>Advarsel:</em> Frekvens er 6,99 &mdash; t&aelig;t p&aring; m&aelig;tning. Overv&aring;g dagligt.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PILLAR 3: WASTED SPEND                      -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge pillar">03 &mdash; Spildt Forbrug</div>
+                <h2>Placeringsanalyse: Audience Network <span class="tier-sub">Fordeling af forbrug og k&oslash;b p&aring; tv&aelig;rs af Facebook, Instagram og Audience Network</span></h2>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>Facebook</th>
+                            <th>Instagram</th>
+                            <th>Audience Network</th>
+                            <th>Signal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">Nature's Body</span></td>
+                            <td>49% forbrug &rarr; <strong>54%</strong> k&oslash;b</td>
+                            <td>41% forbrug &rarr; <strong>45%</strong> k&oslash;b</td>
+                            <td class="cpa-bad">9,3% forbrug &rarr; 0,8% k&oslash;b</td>
+                            <td><span class="verdict action">Spild: ~A$1.340</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">CreativeCarve</span></td>
+                            <td>81% forbrug &rarr; <strong>85%</strong> k&oslash;b</td>
+                            <td>18% forbrug &rarr; <strong>14%</strong> k&oslash;b</td>
+                            <td>1,3% forbrug &rarr; 1,0% k&oslash;b</td>
+                            <td><span class="verdict maintain">OK</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">TrailCam.dk</span></td>
+                            <td>70% forbrug &rarr; <strong>71%</strong> k&oslash;b</td>
+                            <td>30% forbrug &rarr; <strong>28%</strong> k&oslash;b</td>
+                            <td>0,5% forbrug &rarr; 0,8% k&oslash;b</td>
+                            <td><span class="verdict maintain">OK</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="spotlight" style="margin-top: 24px;">
+                <div class="spotlight-label">Spildt Forbrug Spottet</div>
+                <div class="spotlight-title">Nature's Body bruger 9,3% af budget p&aring; Audience Network &mdash; der leverer kun 0,8% af k&oslash;bene</div>
+                <div class="spotlight-body">
+                    Estimeret <strong>~A$1.340</strong> brugt p&aring; Audience Network, som kun genererer ~3 k&oslash;b. Til sammenligning: til Nature's Body's gennemsnitlige CPA p&aring; A$37 kunne de samme penge have genereret <strong>~36 k&oslash;b p&aring; Facebook/Instagram</strong>.
+                    <div class="highlight-box" style="margin-top: 16px;">
+                        <strong>Anbefaling:</strong> Deaktiv&eacute;r Audience Network-placering i begge aktive kampagner (VDAY SALE og VDAYSALE - 30%). Potentiel gevinst: <span class="number">~33</span> ekstra k&oslash;b.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PILLAR 4: IMPLIED AOV                       -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge pillar">04 &mdash; N&oslash;dvendig Ordrev&aelig;rdi</div>
+                <h2>&ldquo;Er denne CPA egentlig d&aring;rlig?&rdquo; <span class="tier-sub">Hvad produktet skal koste for at opn&aring; 3x ROAS &mdash; CPA &times; 3</span></h2>
+            </div>
+
+            <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.75; margin-bottom: 8px;">
+                En CPA p&aring; 500 kr er katastrofal for et produkt til 200 kr, men fremragende for et produkt til 3.000 kr. Uden ROAS-data kan vi beregne den <strong>minimale ordrev&aelig;rdi</strong> der kr&aelig;ves for at hvert k&oslash;b er profitabelt ved 3x ROAS (en konservativ branchestandard). <em>Daniel: Sammenhold disse tal med de faktiske ordrev&aelig;rdier for at identificere de reelt problemfyldte konti.</em>
+            </p>
+
+            <div class="aov-group safe">
+                <div class="aov-group-title">Sandsynligvis profitabel &mdash; lav n&oslash;dvendig AOV</div>
+                <div class="aov-row">
+                    <span class="aov-account">Fenjas Farver</span>
+                    <span class="aov-cpa">CPA: 39 kr</span>
+                    <span class="aov-required safe">AOV &ge; 118 kr (~$17)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Kirkensgaard Mode &amp; Stil</span>
+                    <span class="aov-cpa">CPA: 116 kr</span>
+                    <span class="aov-required safe">AOV &ge; 348 kr (~$49)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Nature's Body Ads</span>
+                    <span class="aov-cpa">CPA: A$37</span>
+                    <span class="aov-required safe">AOV &ge; A$112 (~$71)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Beautytale</span>
+                    <span class="aov-cpa">CPA: 179 kr</span>
+                    <span class="aov-required safe">AOV &ge; 537 kr (~$76)</span>
+                </div>
+            </div>
+
+            <div class="aov-group verify">
+                <div class="aov-group-title">Kr&aelig;ver verifikation &mdash; AOV afg&oslash;r om kontoen er sund</div>
+                <div class="aov-row">
+                    <span class="aov-account">CreativeCarve</span>
+                    <span class="aov-cpa">CPA: 302 kr</span>
+                    <span class="aov-required verify">AOV &ge; 905 kr (~$127)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">BodyFlex</span>
+                    <span class="aov-cpa">CPA: 355 kr</span>
+                    <span class="aov-required verify">AOV &ge; 1.064 kr (~$150)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Dyne Kompagniet</span>
+                    <span class="aov-cpa">CPA: 386 kr</span>
+                    <span class="aov-required verify">AOV &ge; 1.158 kr (~$163)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Trendlights</span>
+                    <span class="aov-cpa">CPA: 399 kr</span>
+                    <span class="aov-required verify">AOV &ge; 1.197 kr (~$169)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Luvoring</span>
+                    <span class="aov-cpa">CPA: 402 kr</span>
+                    <span class="aov-required verify">AOV &ge; 1.207 kr (~$170)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Woods Copenhagen</span>
+                    <span class="aov-cpa">CPA: 436 kr</span>
+                    <span class="aov-required verify">AOV &ge; 1.308 kr (~$184)</span>
+                </div>
+            </div>
+
+            <div class="aov-group risk">
+                <div class="aov-group-title">H&oslash;j risiko &mdash; kr&aelig;ver h&oslash;j-ticket produkter for at v&aelig;re rentable</div>
+                <div class="aov-row">
+                    <span class="aov-account">Copenhagen-Comfort</span>
+                    <span class="aov-cpa">CPA: 519 kr</span>
+                    <span class="aov-required risk">AOV &ge; 1.556 kr (~$219)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">TrailCam.dk</span>
+                    <span class="aov-cpa">CPA: 528 kr</span>
+                    <span class="aov-required risk">AOV &ge; 1.583 kr (~$223)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Beauty4me</span>
+                    <span class="aov-cpa">CPA: 825 kr</span>
+                    <span class="aov-required risk">AOV &ge; 2.475 kr (~$349)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Luna Bloom</span>
+                    <span class="aov-cpa">CPA: 843 kr</span>
+                    <span class="aov-required risk">AOV &ge; 2.530 kr (~$356)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Scandinavian Ease</span>
+                    <span class="aov-cpa">CPA: 893 kr</span>
+                    <span class="aov-required risk">AOV &ge; 2.678 kr (~$377)</span>
+                </div>
+                <div class="aov-row">
+                    <span class="aov-account">Nomods</span>
+                    <span class="aov-cpa">CPA: 1.738 kr</span>
+                    <span class="aov-required risk">AOV &ge; 5.213 kr (~$734)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PILLAR 5: CAMPAIGN ANOMALIES                -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge pillar">05 &mdash; Kampagneanomalier</div>
+                <h2>Strukturelle problemer fundet <span class="tier-sub">Uventede fund i kampagnekonfigurationen for top-konti</span></h2>
+            </div>
+
+            <div class="anomaly-grid">
+                <div class="anomaly-card warning">
+                    <div class="anomaly-icon">Advarsel</div>
+                    <h3>Luvoring: Gamle LINK_CLICKS-kampagner</h3>
+                    <p>
+                        2 kampagner fra <strong>august 2025</strong> med <strong>LINK_CLICKS-m&aring;l</strong> (ikke OUTCOME_SALES) er stadig markeret som &ldquo;aktive&rdquo;. Link-klik-kampagner optimerer for klik, ikke k&oslash;b &mdash; de tiltr&aelig;kker trafik der aldrig konverterer.
+                        <br><br>
+                        <strong>Handling:</strong> Skift til OUTCOME_SALES eller deaktiv&eacute;r kampagnerne.
+                    </p>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-icon">Kritisk</div>
+                    <h3>TrailCam.dk: 0 aktive kampagner</h3>
+                    <p>
+                        Trods et forbrug p&aring; <strong>64.372 kr ($9.065)</strong> blev der ikke fundet nogen kampagner med status ACTIVE. Det kan betyde: kampagner er sat til PAUSED men k&oslash;rer stadig i pipeline, eller kampagnestrukturen er ukonventionel.
+                        <br><br>
+                        <strong>Handling:</strong> Unders&oslash;g kampagnestatus manuelt i Ads Manager.
+                    </p>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-icon">Observation</div>
+                    <h3>Nature's Body: S&aelig;sonkampagner</h3>
+                    <p>
+                        2 aktive kampagner, begge <strong>Valentine's Day-temaer</strong> (VDAY SALE + VDAYSALE - 30%). Stjerneperformance nu, men <strong>disse kampagner udl&oslash;ber efter Valentine's Day</strong>. Forbered n&aelig;ste kampagnestruktur.
+                    </p>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-icon">Observation</div>
+                    <h3>Kun 2 af 5 topkonti har ren SALES-setup</h3>
+                    <p>
+                        Kun <strong>CreativeCarve</strong> (&ldquo;EH - TF&rdquo;) og <strong>Copenhagen-Comfort</strong> (&ldquo;TF: EH&rdquo;) har &eacute;n aktiv OUTCOME_SALES-kampagne. De &oslash;vrige har enten ingen, forkert m&aring;l, eller s&aelig;sonkampagner.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- FULL PORTFOLIO TABLE                        -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge t1">Komplet Oversigt</div>
+                <h2>Alle 16 E-commerce Konti <span class="tier-sub">Sorteret efter forbrug &mdash; n&oslash;gletal fra funnel-analysen</span></h2>
+            </div>
+            <div class="table-wrap" style="overflow-x: auto;">
+                <table style="min-width: 900px;">
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>Forbrug (USD)</th>
+                            <th>K&oslash;b</th>
+                            <th>CPA</th>
+                            <th>Fantomklik</th>
+                            <th>Checkout-tab</th>
+                            <th>Anbefaling</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">CreativeCarve</span> <span class="currency-tag">DKK</span></td>
+                            <td>$12.272</td>
+                            <td><strong>289</strong></td>
+                            <td class="cpa-ok">302 kr</td>
+                            <td>15,4%</td>
+                            <td>54,0%</td>
+                            <td><span class="verdict watch">CPA stiger &mdash; overv&aring;g</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Luvoring</span> <span class="currency-tag">DKK</span></td>
+                            <td>$9.693</td>
+                            <td><strong>171</strong></td>
+                            <td class="cpa-warn">402 kr</td>
+                            <td>15,2%</td>
+                            <td>72,9%</td>
+                            <td><span class="verdict watch">Fix checkout-l&aelig;k</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Nature's Body</span> <span class="currency-tag">AUD</span></td>
+                            <td>$9.078</td>
+                            <td><strong>386</strong></td>
+                            <td class="cpa-good">A$37</td>
+                            <td>22,8%</td>
+                            <td>45,7%</td>
+                            <td><span class="verdict scale">Skal&eacute;r &starf;</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">TrailCam.dk</span> <span class="currency-tag">DKK</span></td>
+                            <td>$9.065</td>
+                            <td><strong>122</strong></td>
+                            <td class="cpa-warn">528 kr</td>
+                            <td>15,7%</td>
+                            <td>44,9%</td>
+                            <td><span class="verdict action">Faldende &mdash; grib ind</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Copenhagen-Comfort</span> <span class="currency-tag">DKK</span></td>
+                            <td>$5.697</td>
+                            <td><strong>78</strong></td>
+                            <td class="cpa-warn">519 kr</td>
+                            <td>25,7%</td>
+                            <td>1,8%</td>
+                            <td><span class="verdict action">CPA tredoblet</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">BodyFlex</span> <span class="currency-tag">DKK</span></td>
+                            <td>$5.695</td>
+                            <td><strong>114</strong></td>
+                            <td class="cpa-ok">355 kr</td>
+                            <td>19,2%</td>
+                            <td>51,7%</td>
+                            <td><span class="verdict maintain">Stabil</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Dyne Kompagniet</span> <span class="currency-tag">DKK</span></td>
+                            <td>$4.676</td>
+                            <td><strong>86</strong></td>
+                            <td class="cpa-ok">386 kr</td>
+                            <td>22,3%</td>
+                            <td>20,2%</td>
+                            <td><span class="verdict maintain">God funnel</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Woods Copenhagen</span> <span class="currency-tag">DKK</span></td>
+                            <td>$4.422</td>
+                            <td><strong>72</strong></td>
+                            <td class="cpa-warn">436 kr</td>
+                            <td style="color: var(--red); font-weight: 600;">61,6%</td>
+                            <td>57,4%</td>
+                            <td><span class="verdict action">Fix landingsside!</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Beauty4me</span> <span class="currency-tag">DKK</span></td>
+                            <td>$3.601</td>
+                            <td><strong>31</strong></td>
+                            <td class="cpa-bad">825 kr</td>
+                            <td style="color: var(--red); font-weight: 600;">41,6%</td>
+                            <td>81,2%</td>
+                            <td><span class="verdict action">Dobbelt l&aelig;k</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Trendlights</span> <span class="currency-tag">DKK</span></td>
+                            <td>$3.540</td>
+                            <td><strong>63</strong></td>
+                            <td class="cpa-ok">399 kr</td>
+                            <td>27,2%</td>
+                            <td>27,4%</td>
+                            <td><span class="verdict maintain">God funnel</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Fenjas Farver</span> <span class="currency-tag">DKK</span></td>
+                            <td>$2.143</td>
+                            <td><strong>388</strong></td>
+                            <td class="cpa-good">39 kr</td>
+                            <td style="color: var(--red); font-weight: 600;">55,7%</td>
+                            <td style="color: var(--red); font-weight: 600;">86,3%</td>
+                            <td><span class="verdict scale">Laveste CPA &mdash; fix checkout</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Nomods</span> <span class="currency-tag">DKK</span></td>
+                            <td>$1.713</td>
+                            <td><strong>7</strong></td>
+                            <td class="cpa-bad">1.738 kr</td>
+                            <td>3,4%</td>
+                            <td>65,2%</td>
+                            <td><span class="verdict check">Niche &mdash; tjek AOV</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Beautytale</span> <span class="currency-tag">DKK</span></td>
+                            <td>$1.613</td>
+                            <td><strong>64</strong></td>
+                            <td class="cpa-ok">179 kr</td>
+                            <td>24,5%</td>
+                            <td style="color: var(--red); font-weight: 600;">81,6%</td>
+                            <td><span class="verdict watch">Fix checkout</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Kirkensgaard</span> <span class="currency-tag">DKK</span></td>
+                            <td>$1.207</td>
+                            <td><strong>74</strong></td>
+                            <td class="cpa-good">116 kr</td>
+                            <td>12,8%</td>
+                            <td>41,1%</td>
+                            <td><span class="verdict scale">Skal&eacute;r</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Luna Bloom</span> <span class="currency-tag">DKK</span></td>
+                            <td>$1.069</td>
+                            <td><strong>9</strong></td>
+                            <td class="cpa-bad">843 kr</td>
+                            <td>26,7%</td>
+                            <td>41,0%</td>
+                            <td><span class="verdict action">For dyrt</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Scandinavian Ease</span> <span class="currency-tag">DKK</span></td>
+                            <td>$754</td>
+                            <td><strong>6</strong></td>
+                            <td class="cpa-bad">893 kr</td>
+                            <td>16,4%</td>
+                            <td>8,0%</td>
+                            <td><span class="verdict action">Betalingsfejl (74% tab)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- LEAD GEN & TRAFFIC                          -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge lead">Lead Generation &amp; Trafik</div>
+                <h2>Ikke-e-commerce konti <span class="tier-sub">3 lead gen + 2 ren trafik/engagement</span></h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>Forbrug (USD)</th>
+                            <th>Resultat</th>
+                            <th>Pris pr. resultat</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">Trovedo</span> <span class="currency-tag">DKK</span></td>
+                            <td>$1.407</td>
+                            <td>448 leads</td>
+                            <td class="cpa-good">22 kr / $3,14</td>
+                            <td><span class="verdict scale">Fremragende CPL</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Adexo</span> <span class="currency-tag">DKK</span></td>
+                            <td>$112</td>
+                            <td>12 leads</td>
+                            <td class="cpa-ok">67 kr / $9,40</td>
+                            <td><span class="verdict maintain">OK, lavt volumen</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Emberpeak Marketing</span> <span class="currency-tag">DKK</span></td>
+                            <td>$1.229</td>
+                            <td>11 leads</td>
+                            <td class="cpa-bad">794 kr / $112</td>
+                            <td><span class="verdict action">Meget dyrt &middot; freq 4,8</span></td>
+                        </tr>
+                        <tr style="border-top: 2px solid var(--border);">
+                            <td><span class="account-name">Hashtag Monday</span> <span class="currency-tag">DKK</span></td>
+                            <td>$671</td>
+                            <td>9.079 klik / 7.197 LPV</td>
+                            <td class="cpa-ok">0,30 kr/klik</td>
+                            <td><span class="verdict check">Kun trafik &mdash; ingen konv.</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Jensen Agency</span> <span class="currency-tag">DKK</span></td>
+                            <td>$469</td>
+                            <td>369 klik / 9 LPV</td>
+                            <td class="cpa-bad">4,39 kr/klik</td>
+                            <td><span class="verdict action">97% fantomklik</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- FREQUENCY ALERTS                            -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="tier-badge t3">Frekvensadvarsel</div>
+                <h2>Ad Fatigue-risiko <span class="tier-sub">Konti med frekvens over 4,0 &mdash; h&oslash;jere frekvens = flere gentagelser per bruger</span></h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Konto</th>
+                            <th>Frekvens</th>
+                            <th>R&aelig;kkevidde</th>
+                            <th>Risiko</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="account-name">Nature's Body</span></td>
+                            <td class="cpa-bad"><strong>6,99</strong></td>
+                            <td>115.497</td>
+                            <td><span class="verdict action">H&oslash;j &mdash; performer stadig, men t&aelig;t p&aring; m&aelig;tning</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Emberpeak Marketing</span></td>
+                            <td class="cpa-bad"><strong>4,80</strong></td>
+                            <td>9.441</td>
+                            <td><span class="verdict action">H&oslash;j &mdash; lille audience, dyr CPL</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">TrailCam.dk</span></td>
+                            <td class="cpa-warn"><strong>4,54</strong></td>
+                            <td>211.597</td>
+                            <td><span class="verdict watch">Forh&oslash;jet &mdash; CPA allerede stigende</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Fenjas Farver</span></td>
+                            <td class="cpa-warn"><strong>4,05</strong></td>
+                            <td>129.224</td>
+                            <td><span class="verdict watch">Moderat &mdash; CTR stadig 3,81%</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="account-name">Beautytale</span></td>
+                            <td class="cpa-warn"><strong>4,03</strong></td>
+                            <td>45.869</td>
+                            <td><span class="verdict watch">Moderat &mdash; overv&aring;g</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- CTA -->
+        <div class="section">
+            <div style="background: var(--text); color: white; padding: 40px 36px; margin-top: 0;">
+                <div style="font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-light); margin-bottom: 12px;">Næste skridt</div>
+                <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 600; line-height: 1.3; margin-bottom: 16px;">Dette er kun et overfladisk diagnostik baseret på Meta Ads-data</div>
+                <p style="font-size: 14px; line-height: 1.75; color: #B0B0B8; max-width: 700px;">
+                    Uden Shopify-data mangler vi omsætning, ROAS, og ordreværdi — de tre nøgletal der afgør, om en konto reelt er profitabel. <strong style="color: white;">Forbind din Shopify til TheAIPipe</strong> for at:
+                </p>
+                <ul style="font-size: 14px; color: #B0B0B8; line-height: 2; margin-top: 12px; padding-left: 20px;">
+                    <li>Få <strong style="color: white;">reel ROAS</strong> per konto, kampagne og annonce</li>
+                    <li>Koble <strong style="color: white;">ordreværdi og LTV</strong> direkte til dine annoncedata</li>
+                    <li>Generere denne type audit <strong style="color: white;">automatisk og dagligt</strong> for hele dit team</li>
+                </ul>
+                <p style="font-size: 13px; color: #71717A; margin-top: 20px; font-style: italic;">
+                    Denne rapport tog AI 4 minutter at generere. Forestil dig den på autopilot.
+                </p>
+            </div>
+        </div>
+
+        <!-- DORMANT -->
+        <div class="dormant-section">
+            <div class="dormant-title">Inaktive konti (ingen forbrug i perioden) &mdash; 20 af 41</div>
+            <div class="dormant-list">
+                <span class="dormant-tag">Rockay Advertising</span>
+                <span class="dormant-tag">Rockay AUS</span>
+                <span class="dormant-tag">Rockay Canada</span>
+                <span class="dormant-tag">Rockay Europe</span>
+                <span class="dormant-tag">Rockay Backup</span>
+                <span class="dormant-tag">Daniel Chabert (DKK)</span>
+                <span class="dormant-tag">Daniel Chabert (USD)</span>
+                <span class="dormant-tag">purplefire</span>
+                <span class="dormant-tag">Purplefire - DC</span>
+                <span class="dormant-tag">Nordic Cozy</span>
+                <span class="dormant-tag">BeyondNorth</span>
+                <span class="dormant-tag">Loewing</span>
+                <span class="dormant-tag">HKA Handel</span>
+                <span class="dormant-tag">JP Holistic Nutrition</span>
+                <span class="dormant-tag">VAIO</span>
+                <span class="dormant-tag">Agency Supremacy</span>
+                <span class="dormant-tag">Sleeklens</span>
+                <span class="dormant-tag">Hashtag Monday 2024</span>
+                <span class="dormant-tag">Nature's Body A1</span>
+                <span class="dormant-tag">KG&lt;&gt;Daniel</span>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="footer-left">
+                <div class="footer-brand">Insights <span>by TheAIPipe</span></div>
+                <div class="footer-text">
+                    V2: Fuld funnel-diagnostik, momentum-analyse, placeringsanalyse og N&oslash;dvendig Ordrev&aelig;rdi (AOV).<br>
+                    Automatisk genereret baseret p&aring; live data fra Meta Ads API.<br>
+                    Alle bel&oslash;b i lokal valuta med USD-konvertering. ROAS ikke tilg&aelig;ngelig &mdash; AOV-verifikation n&oslash;dvendig.
+                </div>
+            </div>
+            <div class="footer-right">
+                <div class="footer-meta">
+                    Rapport genereret: 16. februar 2026<br>
+                    Datakilde: Meta Marketing API (live)<br>
+                    Analyse: 5 pillarer &middot; 97.197 klik &middot; 1.960 k&oslash;b<br>
+                    Valutaer: DKK, NOK, AUD, GBP &rarr; USD
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
