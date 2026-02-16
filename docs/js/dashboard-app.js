@@ -2328,32 +2328,23 @@
             const menu = document.getElementById('account-dropdown-menu');
             if (!menu) return;
 
-            // Get accounts that have at least 1 ad in the last 90 days
-            const accountsWithData = new Set();
-            const data90 = window.periodsData[90];
-            if (data90 && data90.ads && data90.ads.length > 0) {
-                data90.ads.forEach(a => {
-                    if (a.account_name) accountsWithData.add(a.account_name);
+            // Collect ALL account names from multiple sources
+            const allNames = new Set();
+
+            // Source 1: accountsCurrency (loaded from /api/accounts/ — has ALL accounts)
+            const currencyMap = window.accountsCurrency || {};
+            Object.keys(currencyMap).forEach(name => allNames.add(name));
+
+            // Source 2: ad data (fallback, adds any accounts that might be in data but not in API)
+            const longestPeriod = window.periodsData[90] || window.periodsData[30] || window.periodsData[14] || window.periodsData[7];
+            if (longestPeriod && longestPeriod.ads) {
+                longestPeriod.ads.forEach(a => {
+                    if (a.account_name) allNames.add(a.account_name);
                 });
             }
 
-            let names = [];
-            if (accountsWithData.size > 0) {
-                // Filter to only show accounts with data in the last 90 days
-                if (accountsIndex && Array.isArray(accountsIndex.accounts)) {
-                    names = accountsIndex.accounts
-                        .map(a => a.name)
-                        .filter(name => name && accountsWithData.has(name))
-                        .sort();
-                } else {
-                    names = Array.from(accountsWithData).sort();
-                }
-                console.log(`📋 Dropdown: ${names.length} cuentas con datos (de ${accountsIndex?.accounts?.length || '?'} totales)`);
-            } else if (accountsIndex && Array.isArray(accountsIndex.accounts)) {
-                // Fallback: data not loaded yet, show all accounts from index
-                names = accountsIndex.accounts.map(a => a.name).filter(Boolean).sort();
-                console.log(`📋 Dropdown: mostrando ${names.length} cuentas (datos aún no cargados)`);
-            }
+            const names = Array.from(allNames).sort();
+            console.log(`📋 Dropdown: ${names.length} cuentas (${Object.keys(currencyMap).length} from API, rest from ad data)`);
 
             let optionsHTML = `<div class="dropdown-option ${currentAccountName === 'Todos' ? 'active' : ''}" data-value="Todos">${t('dashboard.accounts.all')}</div>`;
             names.forEach(n => {
