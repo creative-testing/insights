@@ -20,6 +20,7 @@ from pydantic import BaseModel
 
 from ..database import get_db
 from ..config import settings
+import httpx
 from ..services.meta_client import meta_client, MetaAPIError
 from ..utils.jwt import create_access_token
 from .. import models
@@ -355,6 +356,11 @@ async def facebook_callback(
 
         return response
 
+    except httpx.TimeoutException:
+        # Transient network timeout to Facebook API — don't pollute Sentry
+        db.rollback()
+        error_url = f"{settings.DASHBOARD_URL}?error=facebook_timeout"
+        return RedirectResponse(url=error_url, status_code=302)
     except MetaAPIError as e:
         sentry_sdk.capture_exception(e)
         raise HTTPException(status_code=502, detail=f"Meta API error: {str(e)}")
@@ -759,6 +765,10 @@ async def sync_facebook_token(
             "message": "Facebook token synced successfully"
         })
 
+    except httpx.TimeoutException:
+        # Transient network timeout to Facebook API — don't pollute Sentry
+        db.rollback()
+        raise HTTPException(status_code=504, detail="Facebook API temporarily unavailable. Please try again.")
     except MetaAPIError as e:
         sentry_sdk.capture_exception(e)
         raise HTTPException(status_code=502, detail=f"Meta API error: {str(e)}")

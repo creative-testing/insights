@@ -6,7 +6,6 @@ Supports both Bearer token (header) and HttpOnly cookie
 SECURITY: Includes "Gatekeeper" pattern to detect zombie users
 (authenticated in Supabase but not synced to local PostgreSQL)
 """
-import sentry_sdk
 from typing import Optional
 from uuid import UUID
 from fastapi import Depends, HTTPException, status, Request
@@ -95,14 +94,14 @@ def get_current_tenant_id(
         return tenant_id
 
     except JWTError as e:
-        sentry_sdk.capture_exception(e)
+        # Expected: expired tokens, invalid signatures — don't pollute Sentry
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid authentication credentials: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except (KeyError, ValueError) as e:
-        sentry_sdk.capture_exception(e)
+        # Malformed token payload — client error, not a server crash
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Malformed token payload: {str(e)}",
@@ -134,14 +133,12 @@ def get_current_user_id(
         return user_id
 
     except JWTError as e:
-        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid authentication credentials: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except (KeyError, ValueError) as e:
-        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Malformed token payload: {str(e)}",
