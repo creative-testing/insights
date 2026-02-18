@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "creative-testing-saas-api"
+name = "insights-api"
 version = "0.1.0"
-description = "Backend API pour Creative Testing SaaS"
+description = "Backend API pour Insights - Meta Ads Analytics"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.114.0",

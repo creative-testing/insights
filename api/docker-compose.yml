@@ -4,7 +4,7 @@ services:
   # PostgreSQL 16 avec RLS (Row Level Security) activé
   db:
     image: postgres:16
-    container_name: creative-testing-db
+    container_name: insights-db
     environment:
       POSTGRES_DB: creative_testing_saas
       POSTGRES_USER: dev
@@ -30,7 +30,7 @@ services:
   # Redis pour les jobs background (fetch + transform)
   redis:
     image: redis:7-alpine
-    container_name: creative-testing-redis
+    container_name: insights-redis
     ports:
       - "6379:6379"
     volumes:
@@ -46,7 +46,7 @@ services:
   # Adminer (interface DB optionnelle, seulement en dev)
   adminer:
     image: adminer:latest
-    container_name: creative-testing-adminer
+    container_name: insights-adminer
     ports:
       - "8080:8080"
     environment:
@@ -62,4 +62,4 @@ volumes:
 
 networks:
   default:
-    name: creative-testing-network
+    name: insights-network

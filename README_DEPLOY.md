@@ -1,4 +1,4 @@
-# README_DEPLOY — SaaS MVP (Vultr VPS + Cloudflare R2)
+# README_DEPLOY — Insights SaaS (Vultr VPS + Cloudflare R2)
 
 ## Objectif
 Déployer l'API FastAPI SaaS en HTTPS sur Vultr VPS, avec OAuth Facebook et stockage R2.
@@ -14,12 +14,12 @@ Déployer l'API FastAPI SaaS en HTTPS sur Vultr VPS, avec OAuth Facebook et stoc
 
 ## 1) Architecture actuelle
 
-**URL de production** : `https://creative-testing.theaipipe.com`
+**URL de production** : `https://insights.theaipipe.com`
 
 **VPS Vultr** :
 - SSH: `ssh root@66.135.5.31`
-- Chemin: `/root/creative-testing-backend/`
-- Docker containers: `creative-testing-api`, `creative-testing-cron`
+- Chemin: `/root/insights-backend/`
+- Docker containers: `insights-api`, `insights-cron`
 - Reverse proxy: nginx sur ports 80/443
 
 **CI/CD** :
@@ -36,7 +36,7 @@ API_VERSION=v1
 SECRET_KEY=<32+ chars>
 SESSION_SECRET=<32+ chars>
 TOKEN_ENCRYPTION_KEY=<Fernet key base64>
-JWT_ISSUER=creative-testing-api
+JWT_ISSUER=insights-api
 
 # DB (PostgreSQL sur le VPS)
 DATABASE_URL=postgresql://...
@@ -45,17 +45,17 @@ DATABASE_URL=postgresql://...
 META_APP_ID=<facebook-app-id>
 META_APP_SECRET=<facebook-app-secret>
 META_API_VERSION=v23.0
-META_REDIRECT_URI=https://creative-testing.theaipipe.com/auth/facebook/callback
+META_REDIRECT_URI=https://insights.theaipipe.com/auth/facebook/callback
 
 # CORS & Cookies
-ALLOWED_ORIGINS=https://creative-testing.theaipipe.com,http://localhost:8080
+ALLOWED_ORIGINS=https://insights.theaipipe.com,http://localhost:8080
 COOKIE_SAMESITE=none
 COOKIE_DOMAIN=
 
 # Dashboard URL (post-OAuth redirect)
-DASHBOARD_URL=https://creative-testing.theaipipe.com/oauth-callback.html
+DASHBOARD_URL=https://insights.theaipipe.com/oauth-callback.html
 
-# Storage R2
+# Storage R2 (bucket name kept as-is for backward compat)
 STORAGE_MODE=r2
 STORAGE_ENDPOINT=https://<account>.r2.cloudflarestorage.com
 STORAGE_ACCESS_KEY=<...>
@@ -70,7 +70,7 @@ SENTRY_DSN=
 
 Vérifiez l'API:
 ```
-curl -s https://creative-testing.theaipipe.com/  # 200 + JSON
+curl -s https://insights.theaipipe.com/health  # 200 + JSON
 ```
 
 ---
@@ -79,7 +79,7 @@ curl -s https://creative-testing.theaipipe.com/  # 200 + JSON
 
 Dans **Facebook Login → Settings**:
 - **Valid OAuth Redirect URIs**:
-  `https://creative-testing.theaipipe.com/auth/facebook/callback`
+  `https://insights.theaipipe.com/auth/facebook/callback`
 - (Optionnel pour Live) Privacy Policy URL + Terms of Service.
 
 > **Switch d'app plus tard** (ex: "Ads‑Alchemy opt"): changez **uniquement** `META_APP_ID` et `META_APP_SECRET` dans les env vars du VPS. Pas de migration nécessaire.
@@ -88,7 +88,7 @@ Dans **Facebook Login → Settings**:
 
 ## 3) Cloudflare R2 (après validation OAuth)
 
-1. Créez un **bucket** (ex: `creative-testing-data`).
+1. Bucket existant: `creative-testing-data` (nom legacy, données existantes — ne pas renommer).
 2. Générez des **API tokens** (Read/Write).
 3. Renseignez dans les env vars du VPS:
 ```
@@ -112,14 +112,13 @@ aws s3 ls --endpoint-url=$STORAGE_ENDPOINT s3://creative-testing-data/
 ## 4) Tests E2E (prod‑like)
 
 1. **Login OAuth**
-   - Ouvrir `https://creative-testing.theaipipe.com/auth/facebook/login`
+   - Ouvrir `https://insights.theaipipe.com/auth/facebook/login`
    - Consent
    - Redirection vers : `DASHBOARD_URL?token=&tenant_id=...`
-   - UI: "Estado: Conectado"
 
 2. **Refresh Data**
-   - Bouton **Actualizar Datos**
-   - Attendu: popup succès & `Última actualización` mise à jour
+   - Cron automatique toutes les 2h
+   - Logs: `docker logs insights-cron`
 
 3. **Data API**
    - `GET /api/data/files/{act_id}/data/optimized/manifest.json` → 200
@@ -186,7 +185,7 @@ META_APP_SECRET=<secret de Ads-Alchemy opt>
 
 2. Vérifie que `Valid OAuth Redirect URIs` contient bien:
 ```
-https://creative-testing.theaipipe.com/auth/facebook/callback
+https://insights.theaipipe.com/auth/facebook/callback
 ```
 
 > Aucune migration à faire. Les tenants restent isolés par `tenant_id`, le user est identifié par Meta, et le pipeline reste identique.

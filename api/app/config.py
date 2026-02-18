@@ -50,7 +50,7 @@ class Settings(BaseSettings):
 
     # Security
     TOKEN_ENCRYPTION_KEY: str
-    JWT_ISSUER: str = "creative-testing-api"  # JWT issuer claim
+    JWT_ISSUER: str = "insights-api"  # JWT issuer claim
 
     # Supabase Auth Integration (pour unification auth)
     SUPABASE_JWT_SECRET: str = ""  # JWT secret pour valider les tokens Supabase

@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: creative-testing-api
+    container_name: insights-api
     network_mode: host  # Utilise le réseau de l'hôte pour accéder à PostgreSQL et Redis locaux
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -58,7 +58,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: creative-testing-cron
+    container_name: insights-cron
     network_mode: host  # Utilise le réseau de l'hôte
     environment:
       - DATABASE_URL=${DATABASE_URL}
