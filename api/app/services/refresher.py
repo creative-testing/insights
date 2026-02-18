@@ -8,6 +8,7 @@ MODE BASELINE vs TAIL (parité avec fetch_with_smart_limits.py):
 - BASELINE (📥 INITIAL SYNC): Premier run → fetch 90 jours complets
 - TAIL (🔄 TAIL REFRESH): Runs suivants → fetch 3 derniers jours, upsert dans baseline
 """
+import asyncio
 import gc
 import json
 import sentry_sdk
@@ -271,6 +272,9 @@ async def sync_account_data(
                 )
                 daily_insights.extend(chunk_data)
                 chunk_start = chunk_end + timedelta(days=1)
+                # Pause entre chunks pour laisser respirer l'API Meta
+                if chunk_start <= end_date:
+                    await asyncio.sleep(2)
             print(f"   📦 Total: {len(daily_insights)} rows from {chunk_num} chunks")
         else:
             daily_insights = await meta_client.get_insights_daily(
