@@ -249,14 +249,37 @@ async def sync_account_data(
     until_date = reference_date
 
     # 7. Fetch daily insights depuis Meta API
+    # Pour les gros fetches (BASELINE 90j), chunker en morceaux de 30j
+    # pour éviter les ReadTimeout côté Meta API
+    CHUNK_SIZE_DAYS = 30
     try:
-        daily_insights = await meta_client.get_insights_daily(
-            ad_account_id=ad_account_id,
-            access_token=access_token,
-            since_date=since_date,
-            until_date=until_date,
-            limit=500
-        )
+        if days_to_fetch > CHUNK_SIZE_DAYS:
+            daily_insights = []
+            chunk_start = today - timedelta(days=days_to_fetch)
+            end_date = today - timedelta(days=1)  # yesterday
+            chunk_num = 0
+            while chunk_start <= end_date:
+                chunk_end = min(chunk_start + timedelta(days=CHUNK_SIZE_DAYS - 1), end_date)
+                chunk_num += 1
+                print(f"   📦 Chunk {chunk_num}: {chunk_start.isoformat()} → {chunk_end.isoformat()}")
+                chunk_data = await meta_client.get_insights_daily(
+                    ad_account_id=ad_account_id,
+                    access_token=access_token,
+                    since_date=chunk_start.isoformat(),
+                    until_date=chunk_end.isoformat(),
+                    limit=500
+                )
+                daily_insights.extend(chunk_data)
+                chunk_start = chunk_end + timedelta(days=1)
+            print(f"   📦 Total: {len(daily_insights)} rows from {chunk_num} chunks")
+        else:
+            daily_insights = await meta_client.get_insights_daily(
+                ad_account_id=ad_account_id,
+                access_token=access_token,
+                since_date=since_date,
+                until_date=until_date,
+                limit=500
+            )
     except MetaAPIError as e:
         raise RefreshError(f"Meta API error: {e}")
 
