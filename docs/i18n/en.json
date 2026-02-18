@@ -117,6 +117,7 @@
     "or_individual": "Or select an individual account:",
     "account_id": "ID",
     "profile": "Profile",
+    "loading_accounts": "Loading accounts...",
     "errors": {
       "cannot_start": "Could not start data loading",
       "job_status": "Error checking job status",
@@ -131,6 +132,9 @@
     "header_title": "Insights Dashboard",
     "header_subtitle": "Creative Performance Analysis • Last updated:",
     "loading": "Loading...",
+    "no_data": "Not enough data",
+    "no_data_period": "📊 No data for {account} in the last {days} days",
+    "no_data_chart": "No data for this period",
     "loading_messages": {
       "connecting": "Connecting to your data...",
       "connecting_sub": "This may take a few seconds",
@@ -153,6 +157,11 @@
       "loading_demographics": "Loading demographic data..."
     },
     "first_load": {
+      "welcome_title": "Welcome! 🎉",
+      "welcome_subtitle": "While we prepare your data, learn to use the dashboard",
+      "connecting_meta": "Connecting to Meta Ads...",
+      "skip_video": "Skip video ⏭️",
+      "go_to_dashboard": "🚀 Go to Dashboard",
       "keep_watching": "Keep watching while we load your data...",
       "data_ready": "Your data is ready! 🎉",
       "data_ready_sub": "You can continue watching the tutorial or go to the dashboard",
@@ -181,6 +190,7 @@
     "kpis": {
       "ads_with_spend": "Ads with Spend",
       "total_spend": "Total Spend",
+      "total_spend_currency": "Total Spend ({currency})",
       "avg_roas": "Average ROAS",
       "conversion_value": "Conversion Value",
       "avg_cpa": "Average CPA",
@@ -199,6 +209,10 @@
       "title": "Ad History ({period} days)",
       "subtitle": "Only ads with spend over $3,000",
       "export": "Export Excel",
+      "ganador": "✅ Winner",
+      "perdedor": "❌ Loser",
+      "type_new": "New",
+      "type_iteration": "Iteration",
       "headers": {
         "ad": "Ad",
         "status": "Status",
@@ -239,16 +253,130 @@
     },
     "efficiency_table": {
       "title": "📊 Efficiency by Format Type",
-      "subtitle": "Comparative performance analysis by creative format"
+      "subtitle": "Comparative performance analysis by creative format",
+      "headers": {
+        "format": "Format",
+        "count": "Count",
+        "total_spend": "Total Spend",
+        "avg_roas": "Average ROAS",
+        "cpa": "CPA",
+        "purchases": "Purchases",
+        "avg_ctr": "Average CTR"
+      }
     },
     "comparison_table": {
       "title": "📈 Week-over-Week Comparison",
+      "dates": "Comparison between current week ({start}-{end}) vs previous week ({pstart}-{pend})",
+      "no_prev_data": "No data in the previous week to compare",
+      "change_extreme": "+999%+",
       "headers": {
         "metric": "Metric",
         "current_week": "Current Week",
         "previous_week": "Previous Week",
         "change": "Change"
       }
+    },
+    "months_short": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "app_switcher": {
+      "current": "current",
+      "imagen_desc": "Image Generation",
+      "insights_desc": "Meta Ads Analytics",
+      "scriptwriter_desc": "Research + Scripts"
+    },
+    "welcome": {
+      "title": "Welcome to Insights!",
+      "subtitle": "This dashboard helps you analyze the performance of your advertising creatives on Meta Ads.",
+      "feature_metrics": "ROAS, CPA and conversion metrics",
+      "feature_angles": "Analysis by angle and creator",
+      "feature_comparison": "Week-over-week comparison",
+      "cta": "Want to watch a 19-minute tutorial?",
+      "btn_tutorial": "Watch Tutorial",
+      "btn_explore": "Explore first"
+    },
+    "nomenclature": {
+      "angles_title": "📊 Creative Angles - {account}",
+      "angles_subtitle": "Analysis based on ad nomenclature",
+      "creators_title": "👥 Performance by Creator",
+      "creators_subtitle": "Performance analysis by content creator",
+      "partial_coverage": "ℹ️ Partial analysis (coverage {pct}%)",
+      "alert_title": "Unlock more powerful insights!",
+      "alert_none": "None of your ads follow the nomenclature.",
+      "alert_low": "Only <strong>{pct}%</strong> of your ads follow the nomenclature.",
+      "alert_benefit": "With proper nomenclature you'll see analysis by angle, creator and hook.",
+      "alert_format": "Type / Angle / Creator / Age / Hook",
+      "alert_example": "E.g.: New / Itch / Maria / 35+ / H1",
+      "alert_btn": "Watch Tutorial (9 min)"
+    },
+    "hooks": {
+      "share_title": "🔖 Hook Type — % share (active ads)",
+      "purchase_title": "🛒 Hook Type — % by purchases",
+      "no_purchases": "No purchases in ads with assigned Hook Type",
+      "base_active": "Base: {total} active ads • Assigned: {assigned} ({pct}%) • Unassigned: {unassigned}",
+      "base_purchases": "Base: {total} purchases (only ads with assigned Hook Type)",
+      "base_zero": "Base: 0 purchases"
+    },
+    "hook_labels": {
+      "Etiquetas": "Labels",
+      "Preguntas": "Questions",
+      "Condicionales": "Conditionals",
+      "Comandos": "Commands",
+      "Declaraciones": "Statements",
+      "Listas o Pasos": "Lists or Steps",
+      "Narrativas": "Narratives",
+      "Exclamaciones / Provocaciones": "Exclamations / Provocations"
+    },
+    "hook_short_labels": {
+      "Exclamaciones / Provocaciones": "Provocations",
+      "Listas o Pasos": "Lists"
+    },
+    "insights_section": {
+      "iter_vs_new": "% Iterations vs New Creatives",
+      "awareness_title": "🧠 Awareness Levels — Distribution",
+      "by_spend": "By Spend",
+      "by_ads": "By Ads",
+      "by_purchases": "By Purchases",
+      "new_label": "New",
+      "iteration_label": "Iteration",
+      "no_label": "No label",
+      "base_spent": "{amount} spent",
+      "base_ads": "{count} ads",
+      "base_purchases": "{count} purchases",
+      "coverage_valid": "Coverage \"Type\" valid: {pct}%",
+      "assigned_pct": "Assigned: {pct}%"
+    },
+    "demographics": {
+      "title": "📊 Demographic Analysis",
+      "subtitle": "Spend distribution by age and gender",
+      "table_title": "Detailed Segment Table",
+      "segment": "Segment",
+      "investment": "Investment",
+      "conversions": "Conversions",
+      "total_spend": "Total Spend",
+      "avg_roas": "Average ROAS",
+      "select_account": "📊 Select a specific account to view demographic data",
+      "no_account_id": "⚠️ Could not identify the account ID"
+    },
+    "share": {
+      "select_first": "Select an account first",
+      "copied": "Copied!",
+      "share_label": "Share",
+      "copy_prompt": "Copy the share link:",
+      "client_mode": "🔒 Client mode: {account}"
+    },
+    "tutorial_titles": {
+      "intro": "📚 Dashboard Tutorial",
+      "nomenclature": "📝 How to Name Your Ads",
+      "dashboard_how": "Tutorial: How to use the Dashboard",
+      "naming_how": "Tutorial: How to name your ads"
+    },
+    "export": {
+      "csv_headers": "Ad,Account,Status,Format,Start Date,Amount Spent,ROAS,CPA,Purchases,CTR,CPM,Hook Type,Hypothesis,Learnings,Result",
+      "winner": "Winner",
+      "loser": "Loser"
+    },
+    "learning_templates": {
+      "winner": "Winner. Learning: what worked (hook/angle/creator)? Next step: scale +20-30% and test 2 variants (hook/CTA).",
+      "loser": "Loser. Learning: what didn't work? Actions: pause or limit delivery; iterate 2 variants (hook/angle/creator) and re-test in 7 days."
     }
   }
 }

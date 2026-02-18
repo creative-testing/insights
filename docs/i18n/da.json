@@ -117,6 +117,7 @@
     "or_individual": "Eller vælg en individuel konto:",
     "account_id": "ID",
     "profile": "Profil",
+    "loading_accounts": "Indlæser konti...",
     "errors": {
       "cannot_start": "Kunne ikke starte dataindlæsning",
       "job_status": "Fejl ved kontrol af jobstatus",
@@ -131,6 +132,9 @@
     "header_title": "Insights Dashboard",
     "header_subtitle": "Kreativ præstationsanalyse • Sidst opdateret:",
     "loading": "Indlæser...",
+    "no_data": "Ikke nok data",
+    "no_data_period": "📊 Ingen data for {account} i de sidste {days} dage",
+    "no_data_chart": "Ingen data for denne periode",
     "loading_messages": {
       "connecting": "Forbinder til dine data...",
       "connecting_sub": "Dette kan tage et par sekunder",
@@ -153,6 +157,11 @@
       "loading_demographics": "Indlæser demografiske data..."
     },
     "first_load": {
+      "welcome_title": "Velkommen! 🎉",
+      "welcome_subtitle": "Mens vi forbereder dine data, kan du lære at bruge dashboardet",
+      "connecting_meta": "Forbinder til Meta Ads...",
+      "skip_video": "Spring video over ⏭️",
+      "go_to_dashboard": "🚀 Gå til Dashboard",
       "keep_watching": "Bliv her mens vi indlæser dine data...",
       "data_ready": "Dine data er klar! 🎉",
       "data_ready_sub": "Du kan fortsætte med at se vejledningen eller gå til dashboardet",
@@ -181,6 +190,7 @@
     "kpis": {
       "ads_with_spend": "Annoncer med forbrug",
       "total_spend": "Samlet forbrug",
+      "total_spend_currency": "Samlet forbrug ({currency})",
       "avg_roas": "Gennemsnitlig ROAS",
       "conversion_value": "Konverteringsværdi",
       "avg_cpa": "Gennemsnitlig CPA",
@@ -199,6 +209,10 @@
       "title": "Annoncehistorik ({period} dage)",
       "subtitle": "Kun annoncer med forbrug over $3.000",
       "export": "Eksporter Excel",
+      "ganador": "✅ Vinder",
+      "perdedor": "❌ Taber",
+      "type_new": "Ny",
+      "type_iteration": "Iteration",
       "headers": {
         "ad": "Annonce",
         "status": "Status",
@@ -239,16 +253,130 @@
     },
     "efficiency_table": {
       "title": "📊 Effektivitet efter formattype",
-      "subtitle": "Sammenlignende præstationsanalyse efter kreativt format"
+      "subtitle": "Sammenlignende præstationsanalyse efter kreativt format",
+      "headers": {
+        "format": "Format",
+        "count": "Antal",
+        "total_spend": "Samlet forbrug",
+        "avg_roas": "Gennemsnitlig ROAS",
+        "cpa": "CPA",
+        "purchases": "Køb",
+        "avg_ctr": "Gennemsnitlig CTR"
+      }
     },
     "comparison_table": {
       "title": "📈 Uge-over-uge sammenligning",
+      "dates": "Sammenligning mellem denne uge ({start}-{end}) og forrige uge ({pstart}-{pend})",
+      "no_prev_data": "Ingen data i den forrige uge at sammenligne med",
+      "change_extreme": "+999%+",
       "headers": {
         "metric": "Metrik",
         "current_week": "Denne uge",
         "previous_week": "Forrige uge",
         "change": "Ændring"
       }
+    },
+    "months_short": ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"],
+    "app_switcher": {
+      "current": "aktuel",
+      "imagen_desc": "Billedgenerering",
+      "insights_desc": "Meta Ads-analyse",
+      "scriptwriter_desc": "Research + Manuskripter"
+    },
+    "welcome": {
+      "title": "Velkommen til Insights!",
+      "subtitle": "Dette dashboard hjælper dig med at analysere dine reklamekreativers præstation på Meta Ads.",
+      "feature_metrics": "ROAS, CPA og konverteringsmetrikker",
+      "feature_angles": "Analyse efter vinkel og skaber",
+      "feature_comparison": "Uge-over-uge sammenligning",
+      "cta": "Vil du se en 19-minutters vejledning?",
+      "btn_tutorial": "Se vejledning",
+      "btn_explore": "Udforsk først"
+    },
+    "nomenclature": {
+      "angles_title": "📊 Kreative vinkler - {account}",
+      "angles_subtitle": "Analyse baseret på annoncenomenklatur",
+      "creators_title": "👥 Præstation efter skaber",
+      "creators_subtitle": "Præstationsanalyse efter indholdsskaber",
+      "partial_coverage": "ℹ️ Delvis analyse (dækning {pct}%)",
+      "alert_title": "Lås op for mere kraftfulde indsigter!",
+      "alert_none": "Ingen af dine annoncer følger nomenklaturen.",
+      "alert_low": "Kun <strong>{pct}%</strong> af dine annoncer følger nomenklaturen.",
+      "alert_benefit": "Med korrekt nomenklatur vil du se analyse efter vinkel, skaber og hook.",
+      "alert_format": "Type / Vinkel / Skaber / Alder / Hook",
+      "alert_example": "F.eks.: Ny / Kløe / Maria / 35+ / H1",
+      "alert_btn": "Se vejledning (9 min)"
+    },
+    "hooks": {
+      "share_title": "🔖 Hook-type — % andel (aktive annoncer)",
+      "purchase_title": "🛒 Hook-type — % efter køb",
+      "no_purchases": "Ingen køb i annoncer med tildelt hook-type",
+      "base_active": "Base: {total} aktive annoncer • Tildelt: {assigned} ({pct}%) • Ikke tildelt: {unassigned}",
+      "base_purchases": "Base: {total} køb (kun annoncer med tildelt hook-type)",
+      "base_zero": "Base: 0 køb"
+    },
+    "hook_labels": {
+      "Etiquetas": "Etiketter",
+      "Preguntas": "Spørgsmål",
+      "Condicionales": "Betingede",
+      "Comandos": "Kommandoer",
+      "Declaraciones": "Udsagn",
+      "Listas o Pasos": "Lister eller trin",
+      "Narrativas": "Fortællinger",
+      "Exclamaciones / Provocaciones": "Udråb / Provokationer"
+    },
+    "hook_short_labels": {
+      "Exclamaciones / Provocaciones": "Provokationer",
+      "Listas o Pasos": "Lister"
+    },
+    "insights_section": {
+      "iter_vs_new": "% Iterationer vs nye kreativer",
+      "awareness_title": "🧠 Bevidsthedsniveauer — Fordeling",
+      "by_spend": "Efter forbrug",
+      "by_ads": "Efter annoncer",
+      "by_purchases": "Efter køb",
+      "new_label": "Ny",
+      "iteration_label": "Iteration",
+      "no_label": "Ingen etiket",
+      "base_spent": "{amount} brugt",
+      "base_ads": "{count} annoncer",
+      "base_purchases": "{count} køb",
+      "coverage_valid": "Dækning \"Type\" gyldig: {pct}%",
+      "assigned_pct": "Tildelt: {pct}%"
+    },
+    "demographics": {
+      "title": "📊 Demografisk analyse",
+      "subtitle": "Forbrugsfordeling efter alder og køn",
+      "table_title": "Detaljeret segmenttabel",
+      "segment": "Segment",
+      "investment": "Investering",
+      "conversions": "Konverteringer",
+      "total_spend": "Samlet forbrug",
+      "avg_roas": "Gennemsnitlig ROAS",
+      "select_account": "📊 Vælg en specifik konto for at se demografiske data",
+      "no_account_id": "⚠️ Kunne ikke identificere konto-ID"
+    },
+    "share": {
+      "select_first": "Vælg en konto først",
+      "copied": "Kopieret!",
+      "share_label": "Del",
+      "copy_prompt": "Kopier delingslinket:",
+      "client_mode": "🔒 Klienttilstand: {account}"
+    },
+    "tutorial_titles": {
+      "intro": "📚 Dashboard-vejledning",
+      "nomenclature": "📝 Sådan navngiver du dine annoncer",
+      "dashboard_how": "Vejledning: Sådan bruger du dashboardet",
+      "naming_how": "Vejledning: Sådan navngiver du dine annoncer"
+    },
+    "export": {
+      "csv_headers": "Annonce,Konto,Status,Format,Startdato,Beløb brugt,ROAS,CPA,Køb,CTR,CPM,Hook-type,Hypotese,Læringer,Resultat",
+      "winner": "Vinder",
+      "loser": "Taber"
+    },
+    "learning_templates": {
+      "winner": "Vinder. Lærdom: hvad virkede (hook/vinkel/skaber)? Næste skridt: skaler +20-30% og test 2 varianter (hook/CTA).",
+      "loser": "Taber. Lærdom: hvad virkede ikke? Handlinger: sæt på pause eller begræns visning; iterer 2 varianter (hook/vinkel/skaber) og test igen om 7 dage."
     }
   }
 }

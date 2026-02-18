@@ -134,6 +134,9 @@
             'Narrativas',
             'Exclamaciones / Provocaciones'
         ];
+        // Translate hook label for display (internal values stay Spanish for localStorage compat)
+        function hookLabel(key) { return t('dashboard.hook_labels.' + key) || key; }
+        function hookShortLabel(key) { return t('dashboard.hook_short_labels.' + key) || hookLabel(key); }
         
         // Removed unused petcareData variable
         let accountsIndex = null; // Index complet des comptes si disponible
@@ -547,7 +550,7 @@
                                     displayText += ` ${hour}h`;
                                 }
                             }
-                            displayText += ' (cargando datos...)';
+                            displayText += ' (' + t('dashboard.loading') + ')';
                         }
                     }
                     
@@ -566,11 +569,12 @@
                         const prevWeekStart = new Date(prevWeekEnd);
                         prevWeekStart.setDate(prevWeekStart.getDate() - 6);
                         
+                        const monthsShort = t('dashboard.months_short') || ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
                         const formatDate = (date) => {
-                            return date.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][date.getMonth()];
+                            return date.getDate() + ' ' + monthsShort[date.getMonth()];
                         };
-                        
-                        comparisonDatesElement.textContent = `Comparación entre semana actual (${formatDate(currentWeekStart)}-${formatDate(currentWeekEnd)}) vs semana anterior (${formatDate(prevWeekStart)}-${formatDate(prevWeekEnd)})`;
+
+                        comparisonDatesElement.textContent = t('dashboard.comparison_table.dates', {start: formatDate(currentWeekStart), end: formatDate(currentWeekEnd), pstart: formatDate(prevWeekStart), pend: formatDate(prevWeekEnd)});
                     }
                 } catch (error) {
                     // Fallback date
@@ -644,16 +648,16 @@
             sec.innerHTML = `
                 <!-- ÁNGULOS CREATIVOS -->
                 <div class="chart-card" style="margin-bottom: 30px;">
-                    <h3>📊 Ángulos Creativos - ${currentAccountName}</h3>
-                    <p style="color: #86868b; font-size: 14px; margin-bottom: 20px;">Análisis basado en la nomenclatura de los anuncios</p>
+                    <h3>${t('dashboard.nomenclature.angles_title', {account: currentAccountName})}</h3>
+                    <p style="color: #86868b; font-size: 14px; margin-bottom: 20px;">${t('dashboard.nomenclature.angles_subtitle')}</p>
                     <p class="nomenclatura-note-angles" style="color:#ff9500;font-size:12px;"></p>
                     <div id="angles-container"></div>
                 </div>
                 
                 <!-- PERFORMANCE POR CREADOR -->
                 <div class="chart-card creators-card" style="margin-bottom: 30px;">
-                    <h3>👥 Performance por Creador</h3>
-                    <p style="color: #86868b; font-size: 14px; margin-bottom: 20px;">Análisis de rendimiento por creador de contenido</p>
+                    <h3>${t('dashboard.nomenclature.creators_title')}</h3>
+                    <p style="color: #86868b; font-size: 14px; margin-bottom: 20px;">${t('dashboard.nomenclature.creators_subtitle')}</p>
                     <p class="nomenclatura-note-creators" style="color:#ff9500;font-size:12px;"></p>
                     <div id="creators-container"></div>
                 </div>`;
@@ -694,7 +698,7 @@
             const others = data.find(([k]) => k === 'OTROS');
 
             if (top.length === 0) {
-                container.innerHTML = '<div style="color:#86868b;text-align:center;padding:20px;">Sin datos suficientes</div>';
+                container.innerHTML = `<div style="color:#86868b;text-align:center;padding:20px;">${t('dashboard.no_data')}</div>`;
                 return;
             }
 
@@ -843,7 +847,7 @@
             // Toujours afficher les créateurs, même avec une couverture faible
             renderCreators(creator, section.querySelector('#creators-container'));
             if (score < 70) {
-                noteCreators.innerHTML = `ℹ️ Análisis parcial (coverage ${coverage.toFixed(0)}%)`;
+                noteCreators.innerHTML = t('dashboard.nomenclature.partial_coverage', {pct: coverage.toFixed(0)});
             }
         }
         
@@ -859,12 +863,12 @@
             
             grid.innerHTML = `
                 <div class="chart-card">
-                    <h3>🔖 Tipo de Hook — % de participación (anuncios activos)</h3>
+                    <h3>${t('dashboard.hooks.share_title')}</h3>
                     <div id="hook-share-chart" class="bar-chart" style="padding-bottom: 90px;"></div>
                     <p id="hook-share-note" style="text-align:center;color:#86868b;margin-top:8px;font-size:12px;"></p>
                 </div>
                 <div class="chart-card">
-                    <h3>🛒 Tipo de Hook — % por compras</h3>
+                    <h3>${t('dashboard.hooks.purchase_title')}</h3>
                     <div id="hook-purchase-chart" class="bar-chart" style="padding-bottom: 90px;"></div>
                     <p id="hook-purchase-note" style="text-align:center;color:#86868b;margin-top:8px;font-size:12px;"></p>
                 </div>
@@ -908,9 +912,7 @@
         function renderHookCharts(stats) {
             // Helper function to get shorter labels for charts
             const getShortLabel = (label) => {
-                if (label === 'Exclamaciones / Provocaciones') return 'Provocaciones';
-                if (label === 'Listas o Pasos') return 'Listas';
-                return label;
+                return hookShortLabel(label);
             };
             
             // 1) % de participation (sur tous les actifs) = counts / totalActive
@@ -930,7 +932,7 @@
                 const note = document.getElementById('hook-share-note');
                 if (note) {
                     const cover = stats.totalActive > 0 ? (stats.assigned / stats.totalActive * 100).toFixed(0) : '0';
-                    note.textContent = `Base: ${stats.totalActive} anuncios activos • Asignados: ${stats.assigned} (${cover}%) • Sin asignar: ${stats.unassigned}`;
+                    note.textContent = t('dashboard.hooks.base_active', {total: stats.totalActive, assigned: stats.assigned, pct: cover, unassigned: stats.unassigned});
                 }
             }
             
@@ -938,7 +940,7 @@
             const purchEl = document.getElementById('hook-purchase-chart');
             if (purchEl) {
                 if (stats.totalPurchasesAssigned <= 0) {
-                    purchEl.innerHTML = `<div style="color:#86868b;text-align:center;width:100%;">Sin compras en anuncios con Tipo de Hook asignado</div>`;
+                    purchEl.innerHTML = `<div style="color:#86868b;text-align:center;width:100%;">${t('dashboard.hooks.no_purchases')}</div>`;
                 } else {
                     const maxPct = Math.max(...HOOK_OPTIONS.map(o => (stats.purchases[o] / stats.totalPurchasesAssigned) * 100));
                     purchEl.innerHTML = HOOK_OPTIONS.map(o => {
@@ -955,8 +957,8 @@
                 const note = document.getElementById('hook-purchase-note');
                 if (note) {
                     note.textContent = stats.totalPurchasesAssigned > 0
-                        ? `Base: ${stats.totalPurchasesAssigned} compras (solo anuncios con Tipo de Hook asignado)`
-                        : `Base: 0 compras`;
+                        ? t('dashboard.hooks.base_purchases', {total: stats.totalPurchasesAssigned})
+                        : t('dashboard.hooks.base_zero');
                 }
             }
         }
@@ -974,11 +976,11 @@
           grid.innerHTML = `
             <div class="chart-card fixed-height">
               <h3>
-                % Iteraciones vs Creativos Nuevos
+                ${t('dashboard.insights_section.iter_vs_new')}
                 <select id="iter-metric" style="margin-left: 10px; padding: 4px 8px; border-radius: 6px; border: 1px solid #d1d1d6; font-size: 12px;">
-                  <option value="spend" selected>Por Gastos</option>
-                  <option value="count">Por Anuncios</option>
-                  <option value="purchases">Por Compras</option>
+                  <option value="spend" selected>${t('dashboard.insights_section.by_spend')}</option>
+                  <option value="count">${t('dashboard.insights_section.by_ads')}</option>
+                  <option value="purchases">${t('dashboard.insights_section.by_purchases')}</option>
                 </select>
               </h3>
               <div id="iter-vs-new-chart" class="bar-chart" style="padding-bottom: 90px;"></div>
@@ -987,11 +989,11 @@
 
             <div class="chart-card fixed-height">
               <h3>
-                🧠 Awareness Levels — Distribución
+                ${t('dashboard.insights_section.awareness_title')}
                 <select id="awareness-metric" style="margin-left: 10px; padding: 4px 8px; border-radius: 6px; border: 1px solid #d1d1d6; font-size: 12px;">
-                  <option value="spend" selected>Por Gastos</option>
-                  <option value="count">Por Anuncios</option>
-                  <option value="purchases">Por Compras</option>
+                  <option value="spend" selected>${t('dashboard.insights_section.by_spend')}</option>
+                  <option value="count">${t('dashboard.insights_section.by_ads')}</option>
+                  <option value="purchases">${t('dashboard.insights_section.by_purchases')}</option>
                 </select>
               </h3>
               <div id="awareness-chart" class="bar-chart" style="padding-bottom: 90px;"></div>
@@ -1064,7 +1066,7 @@
           if (!chart) return;
 
           if (denom <= 0) {
-            chart.innerHTML = `<div style="color:#86868b;text-align:center;width:100%;">Sin datos suficientes</div>`;
+            chart.innerHTML = `<div style="color:#86868b;text-align:center;width:100%;">${t('dashboard.no_data')}</div>`;
             if (note) note.textContent = '';
             return;
           }
@@ -1081,21 +1083,21 @@
           chart.innerHTML = `
             <div class="bar" style="height:${nuevoPct.toFixed(1)}%; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
               <span class="bar-value">${nuevoPct.toFixed(0)}%</span>
-              <span class="bar-label">Nuevo</span>
+              <span class="bar-label">${t('dashboard.insights_section.new_label')}</span>
             </div>
             <div class="bar" style="height:${iterPct.toFixed(1)}%; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
               <span class="bar-value">${iterPct.toFixed(0)}%</span>
-              <span class="bar-label">Iteración</span>
+              <span class="bar-label">${t('dashboard.insights_section.iteration_label')}</span>
             </div>
           `;
 
           if (note) {
             let baseText = '';
-            if (metric === 'spend')      baseText = `${formatMoney(denom)} gastados`;
-            else if (metric === 'count') baseText = `${denom} anuncios`;
-            else                         baseText = `${denom} compras`;
+            if (metric === 'spend')      baseText = t('dashboard.insights_section.base_spent', {amount: formatMoney(denom)});
+            else if (metric === 'count') baseText = t('dashboard.insights_section.base_ads', {count: denom});
+            else                         baseText = t('dashboard.insights_section.base_purchases', {count: denom});
 
-            note.textContent = `Base: ${baseText} • Cobertura "Tipo" válido: ${coveragePct.toFixed(0)}%`;
+            note.textContent = `Base: ${baseText} • ${t('dashboard.insights_section.coverage_valid', {pct: coveragePct.toFixed(0)})}`;
           }
         }
 
@@ -1110,12 +1112,12 @@
             'Solution':    { spend: 0, count: 0, purchases: 0 },
             'Product':     { spend: 0, count: 0, purchases: 0 },
             'Most Aware':  { spend: 0, count: 0, purchases: 0 },
-            'Sin etiqueta':{ spend: 0, count: 0, purchases: 0 }
+            '_no_label':{ spend: 0, count: 0, purchases: 0 }
           };
 
           base.forEach(ad => {
             const lvl = getAwarenessLevel(ad.ad_name, ad.ad_id) || '—';
-            const key = AWARENESS_LEVELS.includes(lvl) ? lvl : 'Sin etiqueta';
+            const key = AWARENESS_LEVELS.includes(lvl) ? lvl : '_no_label';
             const spend = parseFloat(ad.spend || 0);
             const purchases = parseInt(ad.purchases || 0, 10);
 
@@ -1151,7 +1153,7 @@
           if (!chart) return;
 
           if (denom <= 0) {
-            chart.innerHTML = `<div style="color:#86868b;text-align:center;width:100%;">Sin datos suficientes</div>`;
+            chart.innerHTML = `<div style="color:#86868b;text-align:center;width:100%;">${t('dashboard.no_data')}</div>`;
             if (note) note.textContent = '';
             return;
           }
@@ -1162,7 +1164,7 @@
             { key: 'Solution',     label: 'Solution',    color: '#3b82f6' },
             { key: 'Product',      label: 'Product',     color: '#2563eb' },
             { key: 'Most Aware',   label: 'Most',        color: '#1e40af' },
-            { key: 'Sin etiqueta', label: 'Sin etiqueta',color: '#94a3b8' }
+            { key: '_no_label',    label: t('dashboard.insights_section.no_label'), color: '#94a3b8' }
           ];
 
           chart.innerHTML = config.map(({key, label, color}) => {
@@ -1179,11 +1181,11 @@
           if (note) {
             const assignedPct = denom > 0 ? (stats.assigned[metric] / denom) * 100 : 0;
             let baseText = '';
-            if (metric === 'spend')      baseText = `${formatMoney(denom)} gastados`;
-            else if (metric === 'count') baseText = `${denom} anuncios`;
-            else                         baseText = `${denom} compras`;
+            if (metric === 'spend')      baseText = t('dashboard.insights_section.base_spent', {amount: formatMoney(denom)});
+            else if (metric === 'count') baseText = t('dashboard.insights_section.base_ads', {count: denom});
+            else                         baseText = t('dashboard.insights_section.base_purchases', {count: denom});
 
-            note.textContent = `Base: ${baseText} • Asignados: ${assignedPct.toFixed(0)}%`;
+            note.textContent = `Base: ${baseText} • ${t('dashboard.insights_section.assigned_pct', {pct: assignedPct.toFixed(0)})}`;
           }
         }
 
@@ -1200,18 +1202,18 @@
             // Masquer KPIs (afficher 0)
             const kpiCards = document.querySelectorAll('.kpi-content');
             if (kpiCards.length >= 5) {
-                kpiCards[0].innerHTML = '<h3>0</h3><p>Anuncios con Inversión</p>';
+                kpiCards[0].innerHTML = `<h3>0</h3><p>${t('dashboard.kpis.ads_with_spend')}</p>`;
                 const currCode = getCurrentCurrency();
-                kpiCards[1].innerHTML = `<h3>${formatMoney(0)}</h3><p>${currCode ? `Inversión Total (${currCode})` : 'Inversión Total'}</p>`;
-                kpiCards[2].innerHTML = '<h3>—</h3><p>ROAS Promedio</p>';
-                kpiCards[3].innerHTML = '<h3>—</h3><p>Valor de Conversión</p>';
-                kpiCards[4].innerHTML = '<h3>—</h3><p>CPA Promedio</p>';
+                kpiCards[1].innerHTML = `<h3>${formatMoney(0)}</h3><p>${currCode ? t('dashboard.kpis.total_spend_currency', {currency: currCode}) : t('dashboard.kpis.total_spend')}</p>`;
+                kpiCards[2].innerHTML = `<h3>—</h3><p>${t('dashboard.kpis.avg_roas')}</p>`;
+                kpiCards[3].innerHTML = `<h3>—</h3><p>${t('dashboard.kpis.conversion_value')}</p>`;
+                kpiCards[4].innerHTML = `<h3>—</h3><p>${t('dashboard.kpis.avg_cpa')}</p>`;
             }
 
             // Masquer/vider les graphiques principaux
             const barChart = document.querySelector('.bar-chart');
             if (barChart) {
-                barChart.innerHTML = '<div style="text-align:center;color:#86868b;padding:40px;">Sin datos para este período</div>';
+                barChart.innerHTML = `<div style="text-align:center;color:#86868b;padding:40px;">${t('dashboard.no_data_chart')}</div>`;
             }
 
             // Vider le tableau principal
@@ -1220,7 +1222,7 @@
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="16" style="text-align:center;padding:40px;color:#86868b;">
-                            📊 Sin datos para ${currentAccountName} en los últimos ${days} días
+                            ${t('dashboard.no_data_period', {account: currentAccountName, days: days})}
                         </td>
                     </tr>
                 `;
@@ -1342,7 +1344,7 @@
 
                 // KPI 2: Total Spend (with dynamic currency)
                 const currencyCode = getCurrentCurrency();
-                const spendLabel = currencyCode ? `Inversión Total (${currencyCode})` : t('dashboard.kpis.total_spend');
+                const spendLabel = currencyCode ? t('dashboard.kpis.total_spend_currency', {currency: currencyCode}) : t('dashboard.kpis.total_spend');
                 kpiCards[1].innerHTML = `
                     <h3>${formatMoney(totalSpend)}</h3>
                     <p>${spendLabel}</p>
@@ -1651,12 +1653,12 @@
           const headRow = document.querySelector('#ads-table thead tr:first-child');
           if(!headRow) return;
           const map = [
-            { idx:0, key:'ad',        label:'Anuncio' },
-            { idx:3, key:'date',      label:'Fecha Inicio' },
-            { idx:4, key:'spend',     label:'Importe Gastado' },
-            { idx:5, key:'roas',      label:'ROAS' },
-            { idx:6, key:'cpa',       label:'CPA' },
-            { idx:7, key:'purchases', label:'Compras' }
+            { idx:0, key:'ad',        label: t('dashboard.table.headers.ad') },
+            { idx:3, key:'date',      label: t('dashboard.table.headers.start_date') },
+            { idx:4, key:'spend',     label: t('dashboard.table.headers.amount_spent') },
+            { idx:5, key:'roas',      label: t('dashboard.table.headers.roas') },
+            { idx:6, key:'cpa',       label: t('dashboard.table.headers.cpa') },
+            { idx:7, key:'purchases', label: t('dashboard.table.headers.purchases') }
           ];
 
           map.forEach(({idx,key,label})=>{
@@ -1799,7 +1801,7 @@
             const currentValue = angleFilter.value;
             
             // Clear and rebuild options
-            angleFilter.innerHTML = '<option value="">Todos</option>';
+            angleFilter.innerHTML = `<option value="">${t('dashboard.table.filters.all')}</option>`;
             sortedAngles.forEach(angle => {
                 const option = document.createElement('option');
                 option.value = angle.toLowerCase();
@@ -1937,8 +1939,8 @@
                             <td>
                                 <select class="result-select" data-ad-id="${ad.ad_id}">
                                     <option value="">—</option>
-                                    <option value="ganador" ${result === 'ganador' ? 'selected' : ''}>✅ Ganador</option>
-                                    <option value="perdedor" ${result === 'perdedor' ? 'selected' : ''}>❌ Perdedor</option>
+                                    <option value="ganador" ${result === 'ganador' ? 'selected' : ''}>${t('dashboard.table.ganador')}</option>
+                                    <option value="perdedor" ${result === 'perdedor' ? 'selected' : ''}>${t('dashboard.table.perdedor')}</option>
                                 </select>
                             </td>
                         </tr>
@@ -2217,11 +2219,11 @@
                 // Gérer les cas spéciaux
                 if (!isFinite(change)) {
                     // Quand on passe de 0 à quelque chose (division par zéro)
-                    return `<span style="color: #6c757d; cursor: help;" title="Sin datos en la semana anterior para comparar">N/A</span>`;
+                    return `<span style="color: #6c757d; cursor: help;" title="${t('dashboard.comparison_table.no_prev_data')}">N/A</span>`;
                 }
                 if (Math.abs(change) > 999) {
                     // Pour les changements extrêmes mais calculables
-                    return `<span style="color: #00a854; font-weight: 600;" title="Cambio superior al 999%">+999%+</span>`;
+                    return `<span style="color: #00a854; font-weight: 600;" title="${t('dashboard.comparison_table.change_extreme')}">${t('dashboard.comparison_table.change_extreme')}</span>`;
                 }
                 const symbol = change > 0 ? '+' : '';
                 const color = change > 0 ? '#00a854' : change < 0 ? '#ff3b30' : '#6c757d';
@@ -2232,25 +2234,25 @@
             if (comparisonTable) {
                 comparisonTable.innerHTML = `
                     <tr>
-                        <td class="metric">Anuncios con Inversión</td>
+                        <td class="metric">${t('dashboard.kpis.ads_with_spend')}</td>
                         <td class="metric">${current.length.toLocaleString()}</td>
                         <td class="metric">${previous.length.toLocaleString()}</td>
                         <td>${formatChange(adsChange)}</td>
                     </tr>
                     <tr>
-                        <td class="metric">Inversión Total</td>
+                        <td class="metric">${t('dashboard.kpis.total_spend')}</td>
                         <td class="metric">${formatMoney(currentMetrics.spend)}</td>
                         <td class="metric">${formatMoney(prevMetrics.spend)}</td>
                         <td>${formatChange(spendChange)}</td>
                     </tr>
                     <tr>
-                        <td class="metric">ROAS Promedio</td>
+                        <td class="metric">${t('dashboard.kpis.avg_roas')}</td>
                         <td class="metric">${currentMetrics.roas.toFixed(2)}</td>
                         <td class="metric">${prevMetrics.roas.toFixed(2)}</td>
                         <td>${formatChange(roasChange)}</td>
                     </tr>
                     <tr>
-                        <td class="metric">CPA Promedio</td>
+                        <td class="metric">${t('dashboard.kpis.avg_cpa')}</td>
                         <td class="metric">${currentMetrics.cpa > 0 ? formatMoney(currentMetrics.cpa, {decimals: 2}) : 'N/A'}</td>
                         <td class="metric">${prevMetrics.cpa > 0 ? formatMoney(prevMetrics.cpa, {decimals: 2}) : 'N/A'}</td>
                         <td>${prevMetrics.cpa > 0 ? formatChange(cpaChange) : 'N/A'}</td>
@@ -2411,7 +2413,7 @@
                     const segmentsDiv = document.getElementById('segments-distribution');
                     const tableBody = document.getElementById('demographics-table');
                     if (segmentsDiv) {
-                        segmentsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #86868b; font-size: 14px;">📊 Selecciona una cuenta específica para ver datos demográficos</div>';
+                        segmentsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #86868b; font-size: 14px;">' + t('dashboard.demographics.select_account') + '</div>';
                     }
                     if (tableBody) tableBody.innerHTML = '';
                 }
@@ -2577,7 +2579,7 @@
             
             btn.onclick = () => {
                 if (!currentAccountName || currentAccountName === 'Todos') {
-                    alert('Selecciona una cuenta primero');
+                    alert(t('dashboard.share.select_first'));
                     return;
                 }
                 const url = `${location.origin}${location.pathname}?account=${encodeURIComponent(currentAccountName)}&locked=1`;
@@ -2587,7 +2589,7 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            <span>Copiado!</span>
+                            <span>${t('dashboard.share.copied')}</span>
                         `;
                         btn.style.background = 'rgba(76, 217, 100, 0.3)';
                         btn.style.borderColor = 'rgba(76, 217, 100, 0.5)';
@@ -2597,16 +2599,16 @@
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                                 </svg>
-                                <span>Compartir</span>
+                                <span>${t('dashboard.share.share_label')}</span>
                             `;
                             btn.style.background = 'rgba(255,255,255,0.15)';
                             btn.style.borderColor = 'rgba(255,255,255,0.25)';
                         }, 2000);
                     }).catch(()=>{
-                        prompt('Copia el enlace para compartir:', url);
+                        prompt(t('dashboard.share.copy_prompt'), url);
                     });
                 } else {
-                    prompt('Copia el enlace para compartir:', url);
+                    prompt(t('dashboard.share.copy_prompt'), url);
                 }
             };
             container.appendChild(btn);
@@ -2617,7 +2619,7 @@
             if (!hdr) return;
             const badge = document.createElement('div');
             badge.className = 'share-badge';
-            badge.textContent = `🔒 Modo cliente: ${accName}`;
+            badge.textContent = t('dashboard.share.client_mode', {account: accName});
             hdr.appendChild(badge);
         }
 
@@ -2625,11 +2627,11 @@
         const TUTORIAL_VIDEOS = {
             intro: {
                 id: '4ecbc5cb11144dec931d5285a6e70cb7',
-                title: '📚 Tutorial del Dashboard'
+                get title() { return t('dashboard.tutorial_titles.intro'); }
             },
             nomenclature: {
                 id: 'c368e56148ce49b3b3735f7617d6c883',
-                title: '📝 Cómo Nomenclaturar tus Anuncios'
+                get title() { return t('dashboard.tutorial_titles.nomenclature'); }
             }
         };
 
@@ -2747,11 +2749,11 @@
 
                 const tutorials = {
                     intro: {
-                        title: 'Tutorial: Cómo usar el Dashboard',
+                        title: t('dashboard.tutorial_titles.dashboard_how'),
                         url: 'https://www.loom.com/embed/4ecbc5cb11144dec931d5285a6e70cb7?autoplay=1'
                     },
                     nomenclature: {
-                        title: 'Tutorial: Cómo nomenclaturar tus ads',
+                        title: t('dashboard.tutorial_titles.naming_how'),
                         url: 'https://www.loom.com/embed/c368e56148ce49b3b3735f7617d6c883?autoplay=1'
                     }
                 };
@@ -2766,26 +2768,27 @@
         // Show contextual alert when nomenclature coverage is too low
         function showNomenclatureAlert(section, coverage) {
             // Replace the section content with a helpful alert
+            const alertMsg = coverage === 0
+                ? t('dashboard.nomenclature.alert_none')
+                : t('dashboard.nomenclature.alert_low', {pct: coverage.toFixed(0)});
             section.innerHTML = `
                 <div class="nomenclature-alert">
                     <div class="nomenclature-alert-icon">📋</div>
-                    <h4>¡Desbloquea insights más potentes!</h4>
+                    <h4>${t('dashboard.nomenclature.alert_title')}</h4>
                     <p>
-                        ${coverage === 0
-                            ? 'Ninguno de tus anuncios sigue la nomenclatura.'
-                            : `Solo el <strong>${coverage.toFixed(0)}%</strong> de tus anuncios siguen la nomenclatura.`}
-                        Con una buena nomenclatura podrás ver análisis por ángulo, creador y hook.
+                        ${alertMsg}
+                        ${t('dashboard.nomenclature.alert_benefit')}
                     </p>
                     <div class="nomenclature-alert-format">
-                        <code>Tipo / Ángulo / Creador / Edad / Hook</code>
-                        <span class="nomenclature-alert-example">Ej: Nuevo / Picazon / Maria / 35+ / H1</span>
+                        <code>${t('dashboard.nomenclature.alert_format')}</code>
+                        <span class="nomenclature-alert-example">${t('dashboard.nomenclature.alert_example')}</span>
                     </div>
                     <button class="nomenclature-alert-btn" onclick="openTutorialModal('nomenclature'); localStorage.setItem(ONBOARDING_KEYS.tutorialClicked, Date.now().toString()); updateTutorialBadge();">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
                         </svg>
-                        Ver Tutorial (9 min)
+                        ${t('dashboard.nomenclature.alert_btn')}
                     </button>
                 </div>
             `;
@@ -2838,7 +2841,7 @@
                     <circle cx="12" cy="12" r="10"></circle>
                     <polygon points="10 8 16 12 10 16 10 8"></polygon>
                 </svg>
-                ¿Cómo nomenclaturar?
+                ${t('dashboard.tutorial_titles.nomenclature')}
             `;
             link.onclick = () => openTutorialModal('nomenclature');
 
@@ -2887,9 +2890,9 @@
                 if (learningEl && !learningEl.value.trim()) {
                     const tpl =
                         value === 'ganador'
-                            ? 'Ganador. Aprendizaje: ¿qué funcionó (hook/ángulo/creador)? Siguiente paso: escalar +20-30% y probar 2 variantes (hook/CTA).'
+                            ? t('dashboard.learning_templates.winner')
                             : value === 'perdedor'
-                                ? 'Perdedor. Aprendizaje: ¿qué no funcionó? Acciones: pausar o limitar entrega; iterar 2 variantes (hook/ángulo/creador) y re-test en 7 días.'
+                                ? t('dashboard.learning_templates.loser')
                                 : '';
                     if (tpl) {
                         learningEl.value = tpl;
@@ -2976,14 +2979,14 @@
             
             // Prepare CSV content
             let csv = '\ufeff'; // UTF-8 BOM for Excel
-            csv += 'Anuncio,Cuenta,Estado,Formato,Fecha Inicio,Importe Gastado,ROAS,CPA,Compras,CTR,CPM,Tipo de Hook,Hipótesis,Aprendizajes,Resultado\n';
+            csv += t('dashboard.export.csv_headers') + '\n';
             
             filteredTableData.forEach(ad => {
                 const hypothesis = savedData[ad.ad_id]?.hypothesis || '';
                 const learning = savedData[ad.ad_id]?.learning || '';
                 const hookType = savedData[ad.ad_id]?.hookType || '';
                 const result = savedData[ad.ad_id]?.result || '';
-                const startDate = ad.created_time ? new Date(ad.created_time).toLocaleDateString('es-MX') : '';
+                const startDate = ad.created_time ? new Date(ad.created_time).toLocaleDateString(document.documentElement.lang || 'es') : '';
                 const ctr = (parseFloat(ad.clicks || 0) / parseFloat(ad.impressions || 1) * 100).toFixed(2);
                 
                 // Utilise escapeCsv définie ligne 1298 (plus sécurisée)
@@ -3003,7 +3006,7 @@
                     escapeCsv(hookType),
                     escapeCsv(hypothesis),
                     escapeCsv(learning),
-                    result === 'ganador' ? 'Ganador' : result === 'perdedor' ? 'Perdedor' : ''
+                    result === 'ganador' ? t('dashboard.export.winner') : result === 'perdedor' ? t('dashboard.export.loser') : ''
                 ].join(',') + '\n';
             });
             
@@ -3045,7 +3048,7 @@
                 if (!currentAccountName || currentAccountName === 'Todos') {
                     // Hide demographics for Todos
                     if (segmentsDiv) {
-                        segmentsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #86868b; font-size: 14px;">📊 Selecciona una cuenta específica para ver datos demográficos</div>';
+                        segmentsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #86868b; font-size: 14px;">' + t('dashboard.demographics.select_account') + '</div>';
                     }
                     if (tableBody) tableBody.innerHTML = '';
                     return;
@@ -3067,7 +3070,7 @@
                 if (!accountDir) {
                     // No account ID found
                     if (segmentsDiv) {
-                        segmentsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #86868b; font-size: 14px;">⚠️ No se pudo identificar el ID de la cuenta</div>';
+                        segmentsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #86868b; font-size: 14px;">' + t('dashboard.demographics.no_account_id') + '</div>';
                     }
                     if (tableBody) tableBody.innerHTML = '';
                     return;
@@ -3168,15 +3171,15 @@
                     <div style="display: flex; justify-content: space-around; text-align: center;">
                         <div>
                             <div style="font-size: 20px; font-weight: 700; color: #1d1d1f;">$${(totalSpend/1000).toFixed(1)}k</div>
-                            <div style="font-size: 12px; color: #86868b;">Inversión Total</div>
+                            <div style="font-size: 12px; color: #86868b;">${t('dashboard.demographics.total_spend')}</div>
                         </div>
                         <div>
                             <div style="font-size: 20px; font-weight: 700; color: ${avgRoas >= 2.0 ? '#00a854' : avgRoas >= 1.2 ? '#ff9500' : '#ff3b30'};">${avgRoas.toFixed(2)}</div>
-                            <div style="font-size: 12px; color: #86868b;">ROAS Promedio</div>
+                            <div style="font-size: 12px; color: #86868b;">${t('dashboard.demographics.avg_roas')}</div>
                         </div>
                         <div>
                             <div style="font-size: 20px; font-weight: 700; color: #667eea;">${totalPurchases}</div>
-                            <div style="font-size: 12px; color: #86868b;">Conversiones</div>
+                            <div style="font-size: 12px; color: #86868b;">${t('dashboard.demographics.conversions')}</div>
                         </div>
                     </div>
                 </div>

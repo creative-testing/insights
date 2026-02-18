@@ -26,8 +26,8 @@
     <!-- ⏳ Loading Overlay -->
     <div id="loading-overlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text" id="loading-text">Conectando con tus datos...</div>
-        <div class="loading-subtext" id="loading-subtext">Esto puede tomar unos segundos</div>
+        <div class="loading-text" id="loading-text" data-i18n="dashboard.loading_messages.connecting">Conectando con tus datos...</div>
+        <div class="loading-subtext" id="loading-subtext" data-i18n="dashboard.loading_messages.connecting_sub">Esto puede tomar unos segundos</div>
         <div class="loading-progress">
             <div class="loading-progress-bar" id="loading-progress-bar"></div>
         </div>
@@ -36,8 +36,8 @@
     <!-- 🆕 First-time User Overlay with Video (Wait Marketing) -->
     <div id="firstload-overlay">
         <div class="firstload-content">
-            <div class="firstload-title" id="firstload-title">¡Bienvenido! 🎉</div>
-            <div class="firstload-subtitle" id="firstload-subtitle">Mientras preparamos tus datos, aprende a usar el dashboard</div>
+            <div class="firstload-title" id="firstload-title" data-i18n="dashboard.first_load.welcome_title">¡Bienvenido! 🎉</div>
+            <div class="firstload-subtitle" id="firstload-subtitle" data-i18n="dashboard.first_load.welcome_subtitle">Mientras preparamos tus datos, aprende a usar el dashboard</div>
 
             <!-- Video Container - src is set dynamically by showDataPendingUI() to prevent autoplay on every page load -->
             <div class="firstload-video-container" id="firstload-video-container">
@@ -57,17 +57,17 @@
                 <div class="firstload-progress">
                     <div class="firstload-progress-bar" id="firstload-progress-bar"></div>
                 </div>
-                <div class="firstload-text" id="firstload-text">Conectando con Meta Ads...</div>
+                <div class="firstload-text" id="firstload-text" data-i18n="dashboard.first_load.connecting_meta">Conectando con Meta Ads...</div>
             </div>
 
             <!-- Skip Button (visible during loading) -->
             <button class="firstload-skip-btn" id="firstload-skip-btn" style="display: none;">
-                Saltar video ⏭️
+                <span data-i18n="dashboard.first_load.skip_video">Saltar video ⏭️</span>
             </button>
 
             <!-- Ready Button (visible when data ready) -->
             <button class="firstload-ready-btn" id="firstload-ready-btn" style="display: none;">
-                🚀 Ir al Dashboard
+                <span data-i18n="dashboard.first_load.go_to_dashboard">🚀 Ir al Dashboard</span>
             </button>
         </div>
     </div>
@@ -98,7 +98,7 @@
                             </div>
                             <div style="flex: 1;">
                                 <span style="font-weight: 500; color: #334155; font-size: 14px;">Imagen</span>
-                                <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Generación de imágenes</p>
+                                <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;" data-i18n="dashboard.app_switcher.imagen_desc">Generación de imágenes</p>
                             </div>
                         </a>
                         <!-- Insights (current) -->
@@ -109,9 +109,9 @@
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-weight: 500; color: #0f172a; font-size: 14px;">Insights</span>
-                                    <span style="font-size: 10px; background: #e2e8f0; color: #64748b; padding: 2px 6px; border-radius: 4px; font-weight: 500;">actual</span>
+                                    <span style="font-size: 10px; background: #e2e8f0; color: #64748b; padding: 2px 6px; border-radius: 4px; font-weight: 500;" data-i18n="dashboard.app_switcher.current">actual</span>
                                 </div>
-                                <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Analytics Meta Ads</p>
+                                <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;" data-i18n="dashboard.app_switcher.insights_desc">Analytics Meta Ads</p>
                             </div>
                         </div>
                         <!-- Scriptwriter -->
@@ -121,7 +121,7 @@
                             </div>
                             <div style="flex: 1;">
                                 <span style="font-weight: 500; color: #334155; font-size: 14px;">Scriptwriter</span>
-                                <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Investigación + Scripts</p>
+                                <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;" data-i18n="dashboard.app_switcher.scriptwriter_desc">Investigación + Scripts</p>
                             </div>
                         </a>
                     </div>
@@ -188,31 +188,31 @@
             <div class="kpi-card">
                 <div class="kpi-content">
                     <h3>1609</h3>
-                    <p>Anuncios con Inversión</p>
+                    <p data-i18n="dashboard.kpis.ads_with_spend">Anuncios con Inversión</p>
                 </div>
                 <div class="kpi-icon blue">📊</div>
             </div>
-            
+
             <div class="kpi-card">
                 <div class="kpi-content">
                     <h3>$1,569,802</h3>
-                    <p>Inversión Total</p>
+                    <p data-i18n="dashboard.kpis.total_spend">Inversión Total</p>
                 </div>
                 <div class="kpi-icon green">💰</div>
             </div>
-            
+
             <div class="kpi-card">
                 <div class="kpi-content">
                     <h3 id="kpi-roas-value">3.42</h3>
-                    <p id="kpi-roas-label">ROAS Promedio</p>
+                    <p id="kpi-roas-label" data-i18n="dashboard.kpis.avg_roas">ROAS Promedio</p>
                 </div>
                 <div class="kpi-icon purple">📈</div>
             </div>
-            
+
             <div class="kpi-card">
                 <div class="kpi-content">
                     <h3 id="kpi-extra-value">$0</h3>
-                    <p id="kpi-extra-label">Valor de Conversión</p>
+                    <p id="kpi-extra-label" data-i18n="dashboard.kpis.conversion_value">Valor de Conversión</p>
                 </div>
                 <div class="kpi-icon yellow">💵</div>
             </div>
@@ -220,7 +220,7 @@
             <div class="kpi-card">
                 <div class="kpi-content">
                     <h3 id="kpi-cpa-value">$0</h3>
-                    <p id="kpi-cpa-label">CPA Promedio</p>
+                    <p id="kpi-cpa-label" data-i18n="dashboard.kpis.avg_cpa">CPA Promedio</p>
                 </div>
                 <div class="kpi-icon yellow">🎯</div>
             </div>
@@ -228,7 +228,7 @@
         
         <div class="chart-grid">
             <div class="chart-card fixed-height">
-                <h3>💰 Top 5 Cuentas por Inversión</h3>
+                <h3 data-i18n="dashboard.charts.top_accounts">💰 Top 5 Cuentas por Inversión</h3>
                 <div class="bar-chart">
                     <div class="bar" style="height: 100.0%">
                         <span class="bar-value">$236k</span>
@@ -296,7 +296,7 @@
         <div class="main-table-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <div>
-                    <h2 id="table-title">Top 10 Anuncios por ROAS</h2>
+                    <h2 id="table-title" data-i18n="dashboard.table.title">Top 10 Anuncios por ROAS</h2>
                     <p data-i18n="dashboard.table.subtitle">Solo anuncios con inversión mayor a $3,000 MXN</p>
                 </div>
                 <button id="export-excel" class="export-btn" data-i18n="dashboard.table.export">
@@ -350,7 +350,7 @@
                         <th><input type="number" class="table-filter" data-column="7" placeholder="Min..."></th>
                         <th>
                             <select class="table-filter" data-column="8">
-                                <option value="">Todos</option>
+                                <option value="" data-i18n="dashboard.table.filters.all">Todos</option>
                                 <option value="unaware">Unaware</option>
                                 <option value="problem">Problem</option>
                                 <option value="solution">Solution</option>
@@ -360,27 +360,27 @@
                         </th>
                         <th>
                             <select class="table-filter" data-column="9">
-                                <option value="">Todos</option>
-                                <option value="nuevo">Nuevo</option>
-                                <option value="iteracion">Iteración</option>
+                                <option value="" data-i18n="dashboard.table.filters.all">Todos</option>
+                                <option value="nuevo" data-i18n="dashboard.table.type_new">Nuevo</option>
+                                <option value="iteracion" data-i18n="dashboard.table.type_iteration">Iteración</option>
                             </select>
                         </th>
                         <th>
                             <select class="table-filter" data-column="10">
-                                <option value="">Todos</option>
+                                <option value="" data-i18n="dashboard.table.filters.all">Todos</option>
                             </select>
                         </th>
                         <th>
                             <select class="table-filter" data-column="11">
-                                <option value="">Todos</option>
-                                <option value="etiquetas">Etiquetas</option>
-                                <option value="preguntas">Preguntas</option>
-                                <option value="condicionales">Condicionales</option>
-                                <option value="comandos">Comandos</option>
-                                <option value="declaraciones">Declaraciones</option>
-                                <option value="listas o pasos">Listas o Pasos</option>
-                                <option value="narrativas">Narrativas</option>
-                                <option value="exclamaciones / provocaciones">Exclamaciones / Provocaciones</option>
+                                <option value="" data-i18n="dashboard.table.filters.all">Todos</option>
+                                <option value="etiquetas" data-i18n="dashboard.hook_labels.Etiquetas">Etiquetas</option>
+                                <option value="preguntas" data-i18n="dashboard.hook_labels.Preguntas">Preguntas</option>
+                                <option value="condicionales" data-i18n="dashboard.hook_labels.Condicionales">Condicionales</option>
+                                <option value="comandos" data-i18n="dashboard.hook_labels.Comandos">Comandos</option>
+                                <option value="declaraciones" data-i18n="dashboard.hook_labels.Declaraciones">Declaraciones</option>
+                                <option value="listas o pasos" data-i18n="dashboard.hook_labels.Listas o Pasos">Listas o Pasos</option>
+                                <option value="narrativas" data-i18n="dashboard.hook_labels.Narrativas">Narrativas</option>
+                                <option value="exclamaciones / provocaciones" data-i18n="dashboard.hook_labels.Exclamaciones / Provocaciones">Exclamaciones / Provocaciones</option>
                             </select>
                         </th>
                         <th></th> <!-- 12: Ver (no filter) -->
@@ -388,9 +388,9 @@
                         <th></th> <!-- 14: Aprendizajes (no filter) -->
                         <th>
                             <select class="table-filter" data-column="15">
-                                <option value="">Todos</option>
-                                <option value="ganador">Ganador</option>
-                                <option value="perdedor">Perdedor</option>
+                                <option value="" data-i18n="dashboard.table.filters.all">Todos</option>
+                                <option value="ganador" data-i18n="dashboard.table.ganador">Ganador</option>
+                                <option value="perdedor" data-i18n="dashboard.table.perdedor">Perdedor</option>
                             </select>
                         </th>
                     </tr>
@@ -410,13 +410,13 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Formato</th>
-                        <th>Cantidad</th>
-                        <th>Inversión Total</th>
-                        <th>ROAS Promedio</th>
-                        <th>CPA</th>
-                        <th>Compras</th>
-                        <th>CTR Promedio</th>
+                        <th data-i18n="dashboard.efficiency_table.headers.format">Formato</th>
+                        <th data-i18n="dashboard.efficiency_table.headers.count">Cantidad</th>
+                        <th data-i18n="dashboard.efficiency_table.headers.total_spend">Inversión Total</th>
+                        <th data-i18n="dashboard.efficiency_table.headers.avg_roas">ROAS Promedio</th>
+                        <th data-i18n="dashboard.efficiency_table.headers.cpa">CPA</th>
+                        <th data-i18n="dashboard.efficiency_table.headers.purchases">Compras</th>
+                        <th data-i18n="dashboard.efficiency_table.headers.avg_ctr">CTR Promedio</th>
                     </tr>
                 </thead>
                 <tbody id="formato-table">
@@ -428,7 +428,7 @@
         <!-- TABLA COMPARACIÓN SEMANA A SEMANA -->
         <div class="main-table-card">
             <h2 data-i18n="dashboard.comparison_table.title">📈 Comparación Semana a Semana</h2>
-            <p id="comparison-dates">Comparación entre semana actual (21-27 ago) vs semana anterior (14-20 ago)</p>
+            <p id="comparison-dates" data-i18n="dashboard.comparison_table.dates">Comparación entre semana actual (21-27 ago) vs semana anterior (14-20 ago)</p>
 
             <table>
                 <thead>
@@ -547,24 +547,24 @@
         
         <!-- SECTION DEMOGRAPHICS (déplacée à la fin) -->
         <div class="demographics-section" style="display: none; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); margin-bottom: 30px;">
-            <h2 style="margin-bottom: 10px;">📊 Análisis Demográfico</h2>
-            <p style="color: #86868b; margin-bottom: 15px; font-size: 14px;">Distribución del gasto por edad y género</p>
+            <h2 style="margin-bottom: 10px;" data-i18n="dashboard.demographics.title">📊 Análisis Demográfico</h2>
+            <p style="color: #86868b; margin-bottom: 15px; font-size: 14px;" data-i18n="dashboard.demographics.subtitle">Distribución del gasto por edad y género</p>
             
             <!-- Auto-loading demographics content -->
             <div id="demographics-loaded">
                 <div id="segments-distribution" style="margin-bottom: 15px;"></div>
                 
                 <div style="margin-top: 15px;">
-                    <h3 style="font-size: 16px; margin-bottom: 12px;">Tabla Detallada por Segmento</h3>
+                    <h3 style="font-size: 16px; margin-bottom: 12px;" data-i18n="dashboard.demographics.table_title">Tabla Detallada por Segmento</h3>
                     <table>
                         <thead>
                             <tr>
-                                <th>Segmento</th>
-                                <th>Inversión</th>
+                                <th data-i18n="dashboard.demographics.segment">Segmento</th>
+                                <th data-i18n="dashboard.demographics.investment">Inversión</th>
                                 <th>ROAS</th>
                                 <th>CTR</th>
                                 <th>CPA</th>
-                                <th>Conversiones</th>
+                                <th data-i18n="dashboard.demographics.conversions">Conversiones</th>
                             </tr>
                         </thead>
                         <tbody id="demographics-table">
@@ -592,32 +592,32 @@
                 </svg>
             </button>
             <div class="welcome-modal-icon">🎉</div>
-            <h2>¡Bienvenido a Insights!</h2>
-            <p>Este dashboard te ayuda a analizar el rendimiento de tus creativos publicitarios en Meta Ads.</p>
+            <h2 data-i18n="dashboard.welcome.title">¡Bienvenido a Insights!</h2>
+            <p data-i18n="dashboard.welcome.subtitle">Este dashboard te ayuda a analizar el rendimiento de tus creativos publicitarios en Meta Ads.</p>
             <div class="welcome-modal-features">
                 <div class="welcome-feature">
                     <span class="welcome-feature-icon">📊</span>
-                    <span>Métricas de ROAS, CPA y conversiones</span>
+                    <span data-i18n="dashboard.welcome.feature_metrics">Métricas de ROAS, CPA y conversiones</span>
                 </div>
                 <div class="welcome-feature">
                     <span class="welcome-feature-icon">🎯</span>
-                    <span>Análisis por ángulo y creador</span>
+                    <span data-i18n="dashboard.welcome.feature_angles">Análisis por ángulo y creador</span>
                 </div>
                 <div class="welcome-feature">
                     <span class="welcome-feature-icon">📈</span>
-                    <span>Comparación semana a semana</span>
+                    <span data-i18n="dashboard.welcome.feature_comparison">Comparación semana a semana</span>
                 </div>
             </div>
-            <p class="welcome-modal-cta">¿Quieres ver un tutorial de 19 minutos?</p>
+            <p class="welcome-modal-cta" data-i18n="dashboard.welcome.cta">¿Quieres ver un tutorial de 19 minutos?</p>
             <div class="welcome-modal-buttons">
                 <button class="welcome-btn-primary" onclick="watchWelcomeTutorial()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
                     </svg>
-                    Ver Tutorial
+                    <span data-i18n="dashboard.welcome.btn_tutorial">Ver Tutorial</span>
                 </button>
-                <button class="welcome-btn-secondary" onclick="closeWelcomeModal()">
+                <button class="welcome-btn-secondary" onclick="closeWelcomeModal()" data-i18n="dashboard.welcome.btn_explore">
                     Explorar primero
                 </button>
             </div>

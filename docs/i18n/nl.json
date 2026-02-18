@@ -117,6 +117,7 @@
     "or_individual": "Of selecteer een individueel account:",
     "account_id": "ID",
     "profile": "Profiel",
+    "loading_accounts": "Accounts laden...",
     "errors": {
       "cannot_start": "Kon data laden niet starten",
       "job_status": "Fout bij controleren job status",
@@ -131,6 +132,9 @@
     "header_title": "Insights Dashboard",
     "header_subtitle": "Creatieve Prestatie Analyse • Laatst bijgewerkt:",
     "loading": "Laden...",
+    "no_data": "Onvoldoende data",
+    "no_data_period": "📊 Geen data voor {account} in de laatste {days} dagen",
+    "no_data_chart": "Geen data voor deze periode",
     "loading_messages": {
       "connecting": "Verbinden met je data...",
       "connecting_sub": "Dit kan even duren",
@@ -153,6 +157,11 @@
       "loading_demographics": "Demografische data laden..."
     },
     "first_load": {
+      "welcome_title": "Welkom! 🎉",
+      "welcome_subtitle": "Terwijl we je data voorbereiden, leer het dashboard gebruiken",
+      "connecting_meta": "Verbinden met Meta Ads...",
+      "skip_video": "Video overslaan ⏭️",
+      "go_to_dashboard": "🚀 Naar het Dashboard",
       "keep_watching": "Blijf kijken terwijl we je data laden...",
       "data_ready": "Je data is klaar! 🎉",
       "data_ready_sub": "Je kunt de tutorial blijven kijken of naar het dashboard gaan",
@@ -181,6 +190,7 @@
     "kpis": {
       "ads_with_spend": "Advertenties met Uitgaven",
       "total_spend": "Totale Uitgaven",
+      "total_spend_currency": "Totale Uitgaven ({currency})",
       "avg_roas": "Gemiddelde ROAS",
       "conversion_value": "Conversiewaarde",
       "avg_cpa": "Gemiddelde CPA",
@@ -199,6 +209,10 @@
       "title": "Advertentie Geschiedenis ({period} dagen)",
       "subtitle": "Alleen advertenties met uitgaven boven $3.000",
       "export": "Exporteer Excel",
+      "ganador": "✅ Winnaar",
+      "perdedor": "❌ Verliezer",
+      "type_new": "Nieuw",
+      "type_iteration": "Iteratie",
       "headers": {
         "ad": "Advertentie",
         "status": "Status",
@@ -239,16 +253,130 @@
     },
     "efficiency_table": {
       "title": "📊 Efficiëntie per Formaattype",
-      "subtitle": "Vergelijkende prestatie-analyse per creatief formaat"
+      "subtitle": "Vergelijkende prestatie-analyse per creatief formaat",
+      "headers": {
+        "format": "Formaat",
+        "count": "Aantal",
+        "total_spend": "Totale Uitgaven",
+        "avg_roas": "Gemiddelde ROAS",
+        "cpa": "CPA",
+        "purchases": "Aankopen",
+        "avg_ctr": "Gemiddelde CTR"
+      }
     },
     "comparison_table": {
       "title": "📈 Week-over-Week Vergelijking",
+      "dates": "Vergelijking tussen huidige week ({start}-{end}) en vorige week ({pstart}-{pend})",
+      "no_prev_data": "Geen data in de vorige week om te vergelijken",
+      "change_extreme": "+999%+",
       "headers": {
         "metric": "Metric",
         "current_week": "Huidige Week",
         "previous_week": "Vorige Week",
         "change": "Verandering"
       }
+    },
+    "months_short": ["jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"],
+    "app_switcher": {
+      "current": "huidig",
+      "imagen_desc": "Beeldgeneratie",
+      "insights_desc": "Meta Ads Analytics",
+      "scriptwriter_desc": "Onderzoek + Scripts"
+    },
+    "welcome": {
+      "title": "Welkom bij Insights!",
+      "subtitle": "Dit dashboard helpt je de prestaties van je advertentiecreatives op Meta Ads te analyseren.",
+      "feature_metrics": "ROAS, CPA en conversie-metrics",
+      "feature_angles": "Analyse per angle en creator",
+      "feature_comparison": "Week-over-week vergelijking",
+      "cta": "Wil je een tutorial van 19 minuten bekijken?",
+      "btn_tutorial": "Tutorial Bekijken",
+      "btn_explore": "Eerst verkennen"
+    },
+    "nomenclature": {
+      "angles_title": "📊 Creatieve Angles - {account}",
+      "angles_subtitle": "Analyse op basis van advertentienomenclatuur",
+      "creators_title": "👥 Prestaties per Creator",
+      "creators_subtitle": "Prestatie-analyse per content creator",
+      "partial_coverage": "ℹ️ Gedeeltelijke analyse (dekking {pct}%)",
+      "alert_title": "Ontgrendel krachtigere inzichten!",
+      "alert_none": "Geen van je advertenties volgt de nomenclatuur.",
+      "alert_low": "Slechts <strong>{pct}%</strong> van je advertenties volgt de nomenclatuur.",
+      "alert_benefit": "Met de juiste nomenclatuur zie je analyse per angle, creator en hook.",
+      "alert_format": "Type / Angle / Creator / Leeftijd / Hook",
+      "alert_example": "Bijv.: Nieuw / Jeuk / Maria / 35+ / H1",
+      "alert_btn": "Tutorial Bekijken (9 min)"
+    },
+    "hooks": {
+      "share_title": "🔖 Hook Type — % aandeel (actieve advertenties)",
+      "purchase_title": "🛒 Hook Type — % op aankopen",
+      "no_purchases": "Geen aankopen bij advertenties met toegewezen Hook Type",
+      "base_active": "Basis: {total} actieve advertenties • Toegewezen: {assigned} ({pct}%) • Niet-toegewezen: {unassigned}",
+      "base_purchases": "Basis: {total} aankopen (alleen advertenties met toegewezen Hook Type)",
+      "base_zero": "Basis: 0 aankopen"
+    },
+    "hook_labels": {
+      "Etiquetas": "Labels",
+      "Preguntas": "Vragen",
+      "Condicionales": "Voorwaardelijk",
+      "Comandos": "Commando's",
+      "Declaraciones": "Verklaringen",
+      "Listas o Pasos": "Lijsten of Stappen",
+      "Narrativas": "Verhalend",
+      "Exclamaciones / Provocaciones": "Uitroepen / Provocaties"
+    },
+    "hook_short_labels": {
+      "Exclamaciones / Provocaciones": "Provocaties",
+      "Listas o Pasos": "Lijsten"
+    },
+    "insights_section": {
+      "iter_vs_new": "% Iteraties vs Nieuwe Creatives",
+      "awareness_title": "🧠 Awareness Niveaus — Verdeling",
+      "by_spend": "Op Uitgaven",
+      "by_ads": "Op Advertenties",
+      "by_purchases": "Op Aankopen",
+      "new_label": "Nieuw",
+      "iteration_label": "Iteratie",
+      "no_label": "Geen label",
+      "base_spent": "{amount} uitgegeven",
+      "base_ads": "{count} advertenties",
+      "base_purchases": "{count} aankopen",
+      "coverage_valid": "Dekking \"Type\" geldig: {pct}%",
+      "assigned_pct": "Toegewezen: {pct}%"
+    },
+    "demographics": {
+      "title": "📊 Demografische Analyse",
+      "subtitle": "Uitgavenverdeling per leeftijd en geslacht",
+      "table_title": "Gedetailleerde Segmenttabel",
+      "segment": "Segment",
+      "investment": "Investering",
+      "conversions": "Conversies",
+      "total_spend": "Totale Uitgaven",
+      "avg_roas": "Gemiddelde ROAS",
+      "select_account": "📊 Selecteer een specifiek account om demografische data te bekijken",
+      "no_account_id": "⚠️ Kon het account-ID niet identificeren"
+    },
+    "share": {
+      "select_first": "Selecteer eerst een account",
+      "copied": "Gekopieerd!",
+      "share_label": "Delen",
+      "copy_prompt": "Kopieer de deellink:",
+      "client_mode": "🔒 Clientmodus: {account}"
+    },
+    "tutorial_titles": {
+      "intro": "📚 Dashboard Tutorial",
+      "nomenclature": "📝 Hoe je advertenties benoemt",
+      "dashboard_how": "Tutorial: Hoe het Dashboard te gebruiken",
+      "naming_how": "Tutorial: Hoe je advertenties benoemt"
+    },
+    "export": {
+      "csv_headers": "Advertentie,Account,Status,Formaat,Startdatum,Uitgegeven Bedrag,ROAS,CPA,Aankopen,CTR,CPM,Hook Type,Hypothese,Learnings,Resultaat",
+      "winner": "Winnaar",
+      "loser": "Verliezer"
+    },
+    "learning_templates": {
+      "winner": "Winnaar. Learning: wat werkte (hook/angle/creator)? Volgende stap: schaal +20-30% en test 2 varianten (hook/CTA).",
+      "loser": "Verliezer. Learning: wat werkte niet? Acties: pauzeer of beperk levering; itereer 2 varianten (hook/angle/creator) en hertest over 7 dagen."
     }
   }
 }
