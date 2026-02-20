@@ -258,14 +258,26 @@ class MetaClient:
                     self.rate_monitor.parse_headers(response.headers, account_id)
 
                     # Gestion des erreurs HTTP
-                    # Stop retry sur 4xx (sauf 429 rate limit)
+                    # 4xx (sauf 429) = erreur client, pas la peine de retry
                     if 400 <= response.status_code < 500 and response.status_code != 429:
-                        response.raise_for_status()
-                        return response.json()
+                        # Try to extract Meta's error message for better diagnostics
+                        try:
+                            error_body = response.json()
+                            error_msg = error_body.get("error", {}).get("message", "")
+                        except Exception:
+                            error_msg = ""
+                        msg = f"Meta API client error {response.status_code}"
+                        if error_msg:
+                            msg += f": {error_msg}"
+                        msg += f" for url '{response.url}'"
+                        raise MetaAPIError(msg)
 
                     # 5xx ou 429 → retry
                     response.raise_for_status()
                     return response.json()
+
+                except MetaAPIError:
+                    raise  # Don't retry client errors
 
                 except (httpx.HTTPStatusError, httpx.ConnectError, httpx.ReadTimeout) as e:
                     # Dernière tentative → raise
@@ -507,16 +519,19 @@ class MetaClient:
             - date_start, date_stop (each row = 1 day)
             - impressions, clicks, unique_outbound_clicks, reach, frequency
             - cpm, ctr, spend
-            - actions, action_values, conversions, conversion_values
+            - actions, action_values
             - created_time
         """
         insights_url = f"{self.base_url}/{ad_account_id}/insights"
 
         # Fields matching production pipeline (fetch_with_smart_limits.py:271)
+        # NOTE: conversions/conversion_values removed — deprecated in Meta API v19+
+        # causes 400 Bad Request on some accounts in v23.0. actions/action_values
+        # contain the same data and columnar_transform.py already falls back to them.
         fields = (
             "ad_id,ad_name,campaign_name,campaign_id,adset_name,adset_id,"
             "impressions,spend,clicks,unique_outbound_clicks,reach,frequency,"
-            "cpm,ctr,actions,action_values,conversions,conversion_values,created_time"
+            "cpm,ctr,actions,action_values,created_time"
         )
 
         all_insights = []
